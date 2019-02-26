@@ -2,11 +2,11 @@ import java.io.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
-public class DatabaseConnection {
-    private static DatabaseConnection instance = new DatabaseConnection();
+public class DatabaseConnectionSingleton {
+    private static DatabaseConnectionSingleton instance = new DatabaseConnectionSingleton();
     private Connection connection;
 
-    private DatabaseConnection() {
+    private DatabaseConnectionSingleton() {
         String connectionString;
         File connectionsFile = new File("connection.txt");
         try {
@@ -24,7 +24,7 @@ public class DatabaseConnection {
         }
     }
 
-    public static DatabaseConnection getInstance() {
+    public static DatabaseConnectionSingleton getInstance() {
         return instance;
     }
 
