@@ -17,9 +17,9 @@ public class Main  extends Application {
         if (connection.getConnection() != null) {
             System.out.println("working");
         }
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("Login.fxml"));
         primaryStage.setTitle("OurSQL");
-        primaryStage.setScene(new Scene(root, 300, 300));
+        primaryStage.setScene(new Scene(root, 600, 400));
         primaryStage.show();
     }
 }
