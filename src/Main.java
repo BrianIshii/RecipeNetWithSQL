@@ -1,25 +1,26 @@
+import Service.DatabaseConnection;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+public class Main extends Application {
 
-public class Main  extends Application {
+  public static void main(String[] args) {
+    launch(args);
+  }
 
-   public static void main(String[] args) {
-       launch(args);
-   }
-   DatabaseConnectionSingleton connection = DatabaseConnectionSingleton.getInstance();
+  DatabaseConnection connection = DatabaseConnection.getInstance();
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        if (connection.getConnection() != null) {
-            System.out.println("working");
-        }
-        Parent root = FXMLLoader.load(getClass().getResource("Login.fxml"));
-        primaryStage.setTitle("OurSQL");
-        primaryStage.setScene(new Scene(root, 600, 400));
-        primaryStage.show();
+  @Override
+  public void start(Stage primaryStage) throws Exception {
+    if (connection.getConnection() != null) {
+      System.out.println("working");
     }
+    Parent root = FXMLLoader.load(getClass().getResource("Login.fxml"));
+    primaryStage.setTitle("OurSQL");
+    primaryStage.setScene(new Scene(root, 600, 400));
+    primaryStage.show();
+  }
 }
