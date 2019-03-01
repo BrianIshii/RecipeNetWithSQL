@@ -10,16 +10,11 @@ public class Ingredient_Recipe extends Entity {
   public Ingredient_Recipe(Long rid, Ingredient ingredient, Integer amount, String unit) {
     this.setStatus(Status.DIRTY);
     this.ingredient = ingredient;
-    addField(Long.class, "rid", rid, true);
-    addField(Long.class, "iid", ingredient.getValue("iid"), true);
-    addField(Integer.class, "amount", amount, false);
-    addField(String.class, "unit", unit, false);
+    initializeFields(rid, ingredient, amount, unit);
   }
 
-  public Ingredient_Recipe(Ingredient ingredient, Integer amount, String unit) {
-    this.setStatus(Status.NEW);
-    this.ingredient = ingredient;
-    addField(Long.class, "rid", 0L, true);
+  private void initializeFields(Long rid, Ingredient ingredient, Integer amount, String unit) {
+    addField(Long.class, "rid", rid, true);
     addField(Long.class, "iid", ingredient.getValue("iid"), true);
     addField(Integer.class, "amount", amount, false);
     addField(String.class, "unit", unit, false);

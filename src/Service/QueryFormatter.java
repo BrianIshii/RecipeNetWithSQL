@@ -6,10 +6,10 @@ import Entity.Field;
 import java.util.List;
 
 public class QueryFormatter {
-  private static final String INSERT_TEMPLATE = "INSERT INTO %s %s VALUES %s";
-  private static final String SELECT_BASE_TEMPLATE = "SELECT %s FROM %s WHERE %s";
-  private static final String UPDATE_TEMPLATE = "UPDATE %s SET %s WHERE %s";
-  private static final String DELETE_TEMPLATE = "DELETE FROM %s WHERE %s";
+  private static final String INSERT_TEMPLATE = "INSERT INTO %s (%s) VALUES %s;";
+  private static final String SELECT_BASE_TEMPLATE = "SELECT %s FROM %s WHERE %s;";
+  private static final String UPDATE_TEMPLATE = "UPDATE %s SET %s WHERE %s;";
+  private static final String DELETE_TEMPLATE = "DELETE FROM %s WHERE %s;";
 
   public static <E extends Entity> String getInsertQuery(E entity) {
     List<Field> nonPrimaryFields = entity.getNonPrimaryFields();
@@ -20,7 +20,6 @@ public class QueryFormatter {
         createBlankFields(nonPrimaryFields.size()));
   };
 
-
   public static String getSelectByFieldsQuery(Entity entity, List<Field> fields) {
     return String.format(
         SELECT_BASE_TEMPLATE,
@@ -30,18 +29,18 @@ public class QueryFormatter {
   }
 
   public static <E extends Entity> String getDeleteQuery(E entity) {
-      return String.format(
-              DELETE_TEMPLATE,
-              entity.getTableName(),
-              composeCompareFields(entity.getPrimaryKey(), JoinType.AND));
+    return String.format(
+        DELETE_TEMPLATE,
+        entity.getTableName(),
+        composeCompareFields(entity.getPrimaryKey(), JoinType.AND));
   }
 
   public static <E extends Entity> String getUpdateQuery(Entity entity) {
-      return String.format(
-              UPDATE_TEMPLATE,
-              entity.getTableName(),
-              composeCompareFields(entity.getNonPrimaryFields(), JoinType.COMMA),
-              composeCompareFields(entity.getPrimaryKey(), JoinType.AND));
+    return String.format(
+        UPDATE_TEMPLATE,
+        entity.getTableName(),
+        composeCompareFields(entity.getNonPrimaryFields(), JoinType.COMMA),
+        composeCompareFields(entity.getPrimaryKey(), JoinType.AND));
   }
 
   private static String createBlankFields(int n) {
@@ -54,11 +53,11 @@ public class QueryFormatter {
   }
 
   private static String composeSetFields(List<Field> fields) {
-    return "(" + String.join(", ", Field.getFieldNames(fields)) + ")";
+    return String.join(", ", Field.getFieldNames(fields));
   }
 
   private static String composeCompareFields(List<Field> fields, JoinType jt) {
-    return "(" + String.join("=?" + jt.content, Field.getFieldNames(fields)) + "=?)";
+    return String.join("=?" + jt.content, Field.getFieldNames(fields)) + "=?";
   }
 
   private enum JoinType {

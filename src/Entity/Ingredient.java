@@ -5,13 +5,16 @@ public class Ingredient extends Entity {
 
   public Ingredient(Long iid, String name) {
     this.setStatus(Status.DIRTY);
-    addField(Long.class, "iid", iid, true);
-    addField(String.class, "name", name, false);
+    initializeFields(iid, name);
   }
 
   public Ingredient(String name) {
     this.setStatus(Status.NEW);
-    addField(Long.class, "iid", 0L, true);
+    initializeFields(null, name);
+  }
+
+  private void initializeFields(Long iid, String name) {
+    addField(Long.class, "iid", iid == null ? 0L : iid, true);
     addField(String.class, "name", name, false);
   }
 

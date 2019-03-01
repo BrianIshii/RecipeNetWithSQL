@@ -22,6 +22,10 @@ public class ExecutorService {
   private static Method getInt;
   private static Method getDate;
 
+  // Execute
+  private static Method executeUpdate;
+  private static Method executeQuery;
+
   private static List<Class> methodTypes;
   private static List<Method> getters;
   private static List<Method> setters;
@@ -43,6 +47,10 @@ public class ExecutorService {
       getString = ResultSet.class.getDeclaredMethod("getString", String.class);
       getInt = ResultSet.class.getDeclaredMethod("getInt", String.class);
       getDate = ResultSet.class.getDeclaredMethod("getDate", String.class);
+
+      executeUpdate = PreparedStatement.class.getDeclaredMethod("executeUpdate");
+      executeQuery = PreparedStatement.class.getDeclaredMethod("executeQuery");
+
     } catch (NoSuchMethodException nsme) {
       throw new RuntimeException(nsme);
     }
@@ -60,7 +68,7 @@ public class ExecutorService {
       ResultSet generatedKeys = ps.getGeneratedKeys();
       if (generatedKeys.next()) {
         for (Field pk : primaryKeys) {
-          pk.setValue(applyGet(generatedKeys, pk.getValueType(), pk.getKey()));
+          pk.setValue(generatedKeys.getLong(1));
         }
         return true;
       }
@@ -70,7 +78,7 @@ public class ExecutorService {
     return false;
   }
 
-  private static PreparedStatement applyFieldsToStatement(
+  private static void applyFieldsToStatement(
       PreparedStatement ps, int startIndex, List<Field> fields) {
     try {
       int i = startIndex;
@@ -78,7 +86,6 @@ public class ExecutorService {
         applySet(ps, f.getValueType(), f.getValue(), i);
         i++;
       }
-      return ps;
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -124,9 +131,11 @@ public class ExecutorService {
       else
         entity.setStatus(
             extractAndSetPK(ps, entity.getPrimaryKey()) ? Status.UP_TO_DATE : Status.INVALID);
+      ps.close();
     } catch (SQLException sqle) {
-      if (sqle.getMessage().contains("Duplicate")) entity.setStatus(Status.DUPLICATE);
-      else {
+      if (sqle.getMessage().contains("Duplicate")) {
+        return executeFetchByBodyMatch(entity);
+      } else {
         sqle.printStackTrace();
         entity.setStatus(Status.INVALID);
       }
@@ -140,7 +149,8 @@ public class ExecutorService {
       PreparedStatement ps = con.prepareStatement(baseQuery);
       applyFieldsToStatement(ps, 1, entity.getPrimaryKey());
       System.out.println(ps.toString());
-      entity.setStatus(ps.execute() ? Status.DELETED : Status.DIRTY);
+      entity.setStatus(ps.executeUpdate() > 0 ? Status.DELETED : Status.DIRTY);
+      ps.close();
     } catch (SQLException sqle) {
       sqle.printStackTrace();
       entity.setStatus(Status.DIRTY);
@@ -150,22 +160,29 @@ public class ExecutorService {
 
   public <E extends Entity> E executeFetchByPK(E entity) {
     List<Field> fieldsToCompare = entity.getPrimaryKey();
-    return executeAndPopulate(entity, fieldsToCompare);
+    String baseQuery = QueryFormatter.getSelectByFieldsQuery(entity, fieldsToCompare);
+    return executeAndPopulate(entity, baseQuery, fieldsToCompare);
   }
 
   public <E extends Entity> E executeFetchByBodyMatch(E entity) {
     List<Field> fieldsToCompare = entity.getNonPrimaryFields();
     fieldsToCompare.removeIf(f -> f.getValue() == null); // Will not compare field if it is null
-    return executeAndPopulate(entity, fieldsToCompare);
+    String baseQuery = QueryFormatter.getSelectByFieldsQuery(entity, fieldsToCompare);
+    return executeAndPopulate(entity, baseQuery, fieldsToCompare);
   }
 
-  private <E extends Entity> E executeAndPopulate(E entity, List<Field> fieldsToCompare) {
-    String baseQuery = QueryFormatter.getSelectByFieldsQuery(entity, fieldsToCompare);
+  public <E extends Entity> E executeFetch(E entity, List<Field> fields) {
+    String baseQuery = QueryFormatter.getSelectByFieldsQuery(entity, fields);
+    return executeAndPopulate(entity, baseQuery, fields);
+  }
+
+  private <E extends Entity> E executeAndPopulate(
+      E entity, String query, List<Field> fieldsToCompare) {
     try {
-      PreparedStatement ps = con.prepareStatement(baseQuery);
+      PreparedStatement ps = con.prepareStatement(query);
       applyFieldsToStatement(ps, 1, fieldsToCompare);
       System.out.println(ps.toString());
-      ResultSet resultSet = ps.executeQuery();
+      ResultSet resultSet = (ResultSet) executeQuery.invoke(ps);
 
       // Populate the entity with the new data
       if (resultSet.next()) {
@@ -176,10 +193,32 @@ public class ExecutorService {
       } else {
         entity.setStatus(Status.INVALID);
       }
-
+      ps.close();
     } catch (SQLException sqle) {
       sqle.printStackTrace();
       entity.setStatus(Status.INVALID);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+    return entity;
+  }
+
+  public <E extends Entity> E executeUpdate(E entity) {
+    String baseQuery = QueryFormatter.getUpdateQuery(entity);
+    List<Field> fields = entity.getNonPrimaryFields();
+    fields.addAll(entity.getPrimaryKey());
+    try {
+      PreparedStatement ps = con.prepareStatement(baseQuery);
+      applyFieldsToStatement(ps, 1, fields);
+      System.out.println(ps.toString());
+      Integer rowsAffected = (Integer) executeUpdate.invoke(ps);
+      entity.setStatus(rowsAffected > 0 ? Status.UP_TO_DATE : Status.INVALID);
+      ps.close();
+    } catch (SQLException sqle) {
+      sqle.printStackTrace();
+      entity.setStatus(Status.INVALID);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
     return entity;
   }

@@ -5,6 +5,5 @@ public enum Status {
   DIRTY,
   UP_TO_DATE,
   INVALID,
-  DUPLICATE,
   DELETED
 }

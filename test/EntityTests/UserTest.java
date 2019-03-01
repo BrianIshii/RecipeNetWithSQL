@@ -90,4 +90,13 @@ public class UserTest {
         assertThrows(RuntimeException.class, () -> user.setValue("uid", "STRING"));
     assertTrue(thrown.getMessage().contains("Attempting to assign field"));
   }
+
+  @Test
+  public void testIndependence() {
+    User newUser = new User("who", "am", "I");
+    user.setValue("name", "BOGUS");
+    assertNotEquals(newUser.getValue("name"), user.getValue("name"));
+    assertNotEquals(newUser.getValue("email"), user.getValue("email"));
+    assertNotEquals(newUser.getValue("password"), user.getValue("password"));
+  }
 }

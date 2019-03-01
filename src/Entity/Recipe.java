@@ -1,6 +1,7 @@
 package Entity;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Recipe extends Entity {
@@ -12,18 +13,22 @@ public class Recipe extends Entity {
   public Recipe(Long rid, String title, String url, User user, Date date, Integer rating) {
     this.setStatus(Status.DIRTY);
     this.user = user;
-    addField(Long.class, "rid", rid, true);
-    addField(String.class, "title", title, false);
-    addField(String.class, "url", url, false);
-    addField(Long.class, "uid", (Long) user.getPrimaryKey().get(0).getValue(), false);
-    addField(Date.class, "date", date, false);
-    addField(Integer.class, "rating", (Integer) rating, false);
+    this.ingredients = new ArrayList<Ingredient_Recipe>();
+    this.instructions = new ArrayList<Instruction>();
+    initializeFields(rid, title, url, user, date, rating);
   }
 
   public Recipe(String title, String url, User user, Date date, Integer rating) {
     this.setStatus(Status.NEW);
     this.user = user;
-    addField(Long.class, "rid", 0L, true);
+    this.ingredients = new ArrayList<Ingredient_Recipe>();
+    this.instructions = new ArrayList<Instruction>();
+    initializeFields(null, title, url, user, date, rating);
+  }
+
+  private void initializeFields(
+      Long rid, String title, String url, User user, Date date, Integer rating) {
+    addField(Long.class, "rid", rid == null ? 0L : rid, true);
     addField(String.class, "title", title, false);
     addField(String.class, "url", url, false);
     addField(Long.class, "uid", (Long) user.getPrimaryKey().get(0).getValue(), false);

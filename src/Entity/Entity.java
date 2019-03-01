@@ -51,7 +51,7 @@ public abstract class Entity {
   }
 
   public void addField(Class type, String key, Object value, boolean isPrimaryKey) {
-    if(value == null || type == value.getClass()) {
+    if (value == null || type == value.getClass()) {
       Field f = new Field(type, key, value, isPrimaryKey);
       addField(f);
       return;
