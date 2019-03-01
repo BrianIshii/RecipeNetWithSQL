@@ -1,65 +1,25 @@
 package Entity;
 
-import java.util.Arrays;
-import java.util.List;
+public class User extends Entity {
+  public static final String TABLE_NAME = "User";
 
-public class User implements Entity {
-  public static final List<String> attributes = Arrays.asList("name", "email", "password");
-  public static final String PKName = "rid";
-  private Long uid;
-  private String name;
-  private String email;
-  private String pass;
-
-  public User(Long uid, String name, String email, String pass) {
-    this.uid = uid;
-    this.name = name;
-    this.email = email;
-    this.pass = pass;
+  public User(String name, String email, String password) {
+    this.setStatus(Status.NEW);
+    addField(Long.class, "uid", 0L, true);
+    addField(String.class, "name", name, false);
+    addField(String.class, "email", email, false);
+    addField(String.class, "password", password, false);
   }
 
-  public User(String name, String email, String pass) {
-    this.uid = 0L;
-    this.name = name;
-    this.email = email;
-    this.pass = pass;
+  public User(Long uid, String name, String email, String password) {
+    this.setStatus(Status.DIRTY);
+    addField(Long.class, "uid", uid, true);
+    addField(String.class, "name", name, false);
+    addField(String.class, "email", email, false);
+    addField(String.class, "password", password, false);
   }
 
-  public User(String email, String pass) {
-    this.uid = 0L;
-    this.name = null;
-    this.email = email;
-    this.pass = pass;
-  }
-
-  public Long getUid() {
-    return uid;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public String getEmail() {
-    return email;
-  }
-
-  public String getPass() {
-    return pass;
-  }
-
-  public void setUid(Long uid) {
-    this.uid = uid;
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder("User{");
-    sb.append("uid=").append(uid);
-    sb.append(", name='").append(name).append('\'');
-    sb.append(", email='").append(email).append('\'');
-    sb.append(", pass='").append(pass).append('\'');
-    sb.append('}');
-    return sb.toString();
+  public String getTableName() {
+    return TABLE_NAME;
   }
 }

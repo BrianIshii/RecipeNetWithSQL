@@ -1,37 +1,21 @@
 package Entity;
 
-public class Ingredient implements Entity {
-  private Long iid;
-  private String name;
+public class Ingredient extends Entity {
+  private static String TABLE_NAME = "Recipe";
 
   public Ingredient(Long iid, String name) {
-    this.iid = iid;
-    this.name = name;
+    this.setStatus(Status.DIRTY);
+    addField(Long.class, "iid", iid, true);
+    addField(String.class, "name", name, false);
   }
 
   public Ingredient(String name) {
-    this.iid = 0L;
-    this.name = name;
+    this.setStatus(Status.NEW);
+    addField(Long.class, "iid", 0L, true);
+    addField(String.class, "name", name, false);
   }
 
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder("Ingredient{");
-    sb.append("iid=").append(iid);
-    sb.append(", name='").append(name).append('\'');
-    sb.append('}');
-    return sb.toString();
-  }
-
-  public Long getIid() {
-    return iid;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setIid(Long iid) {
-    this.iid = iid;
+  public String getTableName() {
+    return TABLE_NAME;
   }
 }

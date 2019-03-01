@@ -19,16 +19,6 @@ public abstract class EntityService {
     throw new RuntimeException("getInstance() has not been bound.");
   };
 
-  static Long getKey(PreparedStatement ps) {
-    try {
-      ResultSet generatedKeys = ps.getGeneratedKeys();
-
-      if (generatedKeys.next()) return generatedKeys.getLong(1);
-    } catch (SQLException sqle) {
-      sqle.printStackTrace();
-    }
-    return -1L;
-  }
 
   public boolean deleteByPK(String tableName, String pkName, Long pk) {
     try {
@@ -42,20 +32,4 @@ public abstract class EntityService {
     }
   }
 
-  protected String createBlankFields(int n) {
-    StringBuilder stringBuilder = new StringBuilder("(");
-    for (int i = 0; i < n - 1; i++) {
-      stringBuilder.append("?, ");
-    }
-    stringBuilder.append("?)");
-    return stringBuilder.toString();
-  }
-
-  protected String composeSetFields(List<String> fields) {
-    return "(" + String.join(", ", fields) + ")";
-  }
-
-  protected String composeCompareFields(List<String> fields) {
-    return "(" + String.join("=?,", fields) + "=?";
-  }
 }
