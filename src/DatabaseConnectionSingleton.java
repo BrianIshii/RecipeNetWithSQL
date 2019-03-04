@@ -13,7 +13,7 @@ public class DatabaseConnectionSingleton {
             BufferedReader br = new BufferedReader(new FileReader(connectionsFile));
             connectionString = br.readLine();
 
-            Class.forName("com.mysql.jdbc.Driver");
+            Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection(connectionString);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
