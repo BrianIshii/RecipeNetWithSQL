@@ -149,7 +149,7 @@ public class ExecutorService {
       PreparedStatement ps = con.prepareStatement(baseQuery);
       applyFieldsToStatement(ps, 1, entity.getPrimaryKey());
       System.out.println(ps.toString());
-      entity.setStatus(ps.executeUpdate() > 0 ? Status.DELETED : Status.DIRTY);
+      entity.setStatus(ps.executeUpdate() > 0 ? Status.DELETED_FROM_REMOTE : Status.DIRTY);
       ps.close();
     } catch (SQLException sqle) {
       sqle.printStackTrace();

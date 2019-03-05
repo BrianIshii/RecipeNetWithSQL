@@ -13,6 +13,16 @@ public class User extends Entity {
     initializeFields(uid, name, email, password);
   }
 
+    public User(Long uid) {
+        this.setStatus(Status.DIRTY);
+        initializeFields(uid, null, null, null);
+    }
+
+    public User() {
+        this.setStatus(Status.INVALID);
+        initializeFields(null, null, null, null);
+    }
+
   private void initializeFields(Long uid, String name, String email, String password) {
     addField(Long.class, "uid", uid == null ? 0L : uid, true);
     addField(String.class, "name", name, false);

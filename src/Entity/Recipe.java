@@ -36,6 +36,19 @@ public class Recipe extends Entity {
     addField(Integer.class, "rating", (Integer) rating, false);
   }
 
+  public void addIngredient(Ingredient ingredient, Integer amount, String unit) {
+    Ingredient_Recipe ingredient_recipe = new Ingredient_Recipe((Long) this.getValue("rid"), ingredient, amount, unit);
+    this.ingredients.add(ingredient_recipe);
+  }
+
+  public void removeIngredient(Ingredient ingredient) {
+    for (Ingredient_Recipe i : this.ingredients) {
+      if (i.equals(ingredient)) {
+        i.setStatus(Status.DELETED_LOCALLY);
+      }
+    }
+  }
+
   public String getTableName() {
     return TABLE_NAME;
   }

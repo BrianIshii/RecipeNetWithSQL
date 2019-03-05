@@ -33,7 +33,7 @@ public class TestExecutorService {
     executorService.executeFetchByBodyMatch(user);
     assertEquals(Status.UP_TO_DATE, user.getStatus());
     executorService.executeDelete(user);
-    assertEquals(Status.DELETED, user.getStatus());
+    assertEquals(Status.DELETED_FROM_REMOTE, user.getStatus());
   }
 
   @Test
@@ -54,7 +54,7 @@ public class TestExecutorService {
     if (user.getStatus() == Status.INVALID) {
       user = executorService.executeFetch(user, Arrays.asList(user.getField("email")));
       user = executorService.executeDelete(user);
-      assertEquals(Status.DELETED, user.getStatus(), "Deleting left over user");
+      assertEquals(Status.DELETED_FROM_REMOTE, user.getStatus(), "Deleting left over user");
     }
     user = new User("User", "s@g", "test");
     executorService.executeInsert(user);

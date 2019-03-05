@@ -90,4 +90,12 @@ public abstract class Entity {
   public void setStatus(Status status) {
     this.status = status;
   }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Entity entity = (Entity) o;
+        return Field.compareFields(fields, entity.fields);
+    }
 }

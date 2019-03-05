@@ -59,6 +59,19 @@ public class Field<T> {
     return this.type;
   }
 
+  public static boolean compareFields(List<Field> f1, List<Field> f2) {
+    if (f1 == null || f2 == null || f1.size() != f2.size()) {
+      return false;
+    }
+
+    for (int i = 0; i < f1.size(); i++) {
+      if (!f1.get(i).equals(f2.get(i)))
+        return false;
+    }
+    return true;
+  }
+
+
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("Field{");
