@@ -1,46 +1,46 @@
 package Service;
 
-import Entity.Entity;
 import Entity.Field;
 
 import java.util.List;
 
 public class QueryFormatter {
   private static final String INSERT_TEMPLATE = "INSERT INTO %s (%s) VALUES %s;";
-  private static final String SELECT_BASE_TEMPLATE = "SELECT %s FROM %s WHERE %s;";
+  private static final String SELECT_BASE_TEMPLATE = "SELECT %s FROM %s;";
+  private static final String SELECT_WHERE_TEMPLATE = "SELECT %s FROM %s WHERE %s;";
   private static final String UPDATE_TEMPLATE = "UPDATE %s SET %s WHERE %s;";
   private static final String DELETE_TEMPLATE = "DELETE FROM %s WHERE %s;";
 
-  public static <E extends Entity> String getInsertQuery(E entity) {
-    List<Field> nonPrimaryFields = entity.getNonPrimaryFields();
+  public static String getInsertQuery(String tableName, List<Field> newFields) {
     return String.format(
-        INSERT_TEMPLATE,
-        entity.getTableName(),
-        composeSetFields(nonPrimaryFields),
-        createBlankFields(nonPrimaryFields.size()));
-  };
-
-  public static String getSelectByFieldsQuery(Entity entity, List<Field> fields) {
-    return String.format(
-        SELECT_BASE_TEMPLATE,
-        "*",
-        entity.getTableName(),
-        composeCompareFields(fields, JoinType.AND));
+        INSERT_TEMPLATE, tableName, composeFields(newFields), createBlankFields(newFields.size()));
   }
 
-  public static <E extends Entity> String getDeleteQuery(E entity) {
-    return String.format(
-        DELETE_TEMPLATE,
-        entity.getTableName(),
-        composeCompareFields(entity.getPrimaryKey(), JoinType.AND));
+  public static String getSelectQuery(
+      String tableName, List<Field> fieldsToExpect, List<Field> fieldsWhere) {
+    if (fieldsWhere == null || fieldsWhere.size() == 0) {
+      return String.format(SELECT_BASE_TEMPLATE, composeFields(fieldsToExpect), tableName);
+    } else {
+      return String.format(
+          SELECT_WHERE_TEMPLATE,
+          composeFields(fieldsToExpect),
+          tableName,
+          composeCompareFields(fieldsWhere, JoinType.AND));
+    }
   }
 
-  public static <E extends Entity> String getUpdateQuery(Entity entity) {
+  public static String getDeleteQuery(String tableName, List<Field> fieldsWhere) {
+    return String.format(
+        DELETE_TEMPLATE, tableName, composeCompareFields(fieldsWhere, JoinType.AND));
+  }
+
+  public static String getUpdateQuery(
+      String tableName, List<Field> fieldsSet, List<Field> fieldsWhere) {
     return String.format(
         UPDATE_TEMPLATE,
-        entity.getTableName(),
-        composeCompareFields(entity.getNonPrimaryFields(), JoinType.COMMA),
-        composeCompareFields(entity.getPrimaryKey(), JoinType.AND));
+        tableName,
+        composeCompareFields(fieldsSet, JoinType.COMMA),
+        composeCompareFields(fieldsWhere, JoinType.AND));
   }
 
   private static String createBlankFields(int n) {
@@ -52,7 +52,7 @@ public class QueryFormatter {
     return stringBuilder.toString();
   }
 
-  private static String composeSetFields(List<Field> fields) {
+  private static String composeFields(List<Field> fields) {
     return String.join(", ", Field.getFieldNames(fields));
   }
 

@@ -65,12 +65,27 @@ public class Field<T> {
     }
 
     for (int i = 0; i < f1.size(); i++) {
-      if (!f1.get(i).equals(f2.get(i)))
-        return false;
+      if (!f1.get(i).equals(f2.get(i))) return false;
     }
     return true;
   }
 
+  public static List<Field> applyTo(List<Field> from, List<Field> to, boolean isStrict) {
+    for (Field f : from) {
+      boolean added = false;
+      for (Field g : to) {
+        if (f.key.equals(g.key)) {
+          g.setValue(f.getValue());
+          added = true;
+        }
+      }
+      if (!added && isStrict)
+        throw new RuntimeException(
+                String.format(
+                        "Could not apply %s to %s, field does not exist", f.toString(), to.toString()));
+    }
+    return to;
+  }
 
   @Override
   public String toString() {

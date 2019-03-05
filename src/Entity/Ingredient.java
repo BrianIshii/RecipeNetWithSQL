@@ -1,7 +1,7 @@
 package Entity;
 
 public class Ingredient extends Entity {
-  private static String TABLE_NAME = "Recipe";
+  public static final String TABLE_NAME = "Ingredient";
 
   public Ingredient(Long iid, String name) {
     this.setStatus(Status.DIRTY);
@@ -11,6 +11,16 @@ public class Ingredient extends Entity {
   public Ingredient(String name) {
     this.setStatus(Status.NEW);
     initializeFields(null, name);
+  }
+
+  public Ingredient(Long iid) {
+    this.setStatus(Status.NEW);
+    initializeFields(iid, null);
+  }
+
+  public Ingredient() {
+    this.setStatus(Status.NEW);
+    initializeFields(null, null);
   }
 
   private void initializeFields(Long iid, String name) {

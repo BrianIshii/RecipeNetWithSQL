@@ -6,7 +6,7 @@ import java.util.List;
 
 public abstract class Entity {
   protected Status status = Status.NEW;
-  List<Field> fields = new LinkedList<Field>();
+  protected List<Field> fields = new LinkedList<Field>();
 
   public abstract String getTableName();
 

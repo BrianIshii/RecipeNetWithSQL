@@ -5,15 +5,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Recipe extends Entity {
-  private static String TABLE_NAME = "Recipe";
+  public static final String TABLE_NAME = "Recipe";
   private User user;
-  private List<Ingredient_Recipe> ingredients;
+  private List<IngredientRecipe> ingredients;
   private List<Instruction> instructions;
+
+  public Recipe(Long rid) {
+    this.setStatus(Status.DIRTY);
+    this.ingredients = new ArrayList<IngredientRecipe>();
+    this.instructions = new ArrayList<Instruction>();
+    initializeFields(rid, null, null, null, null, null);
+  }
 
   public Recipe(Long rid, String title, String url, User user, Date date, Integer rating) {
     this.setStatus(Status.DIRTY);
     this.user = user;
-    this.ingredients = new ArrayList<Ingredient_Recipe>();
+    this.ingredients = new ArrayList<IngredientRecipe>();
     this.instructions = new ArrayList<Instruction>();
     initializeFields(rid, title, url, user, date, rating);
   }
@@ -21,9 +28,17 @@ public class Recipe extends Entity {
   public Recipe(String title, String url, User user, Date date, Integer rating) {
     this.setStatus(Status.NEW);
     this.user = user;
-    this.ingredients = new ArrayList<Ingredient_Recipe>();
+    this.ingredients = new ArrayList<IngredientRecipe>();
     this.instructions = new ArrayList<Instruction>();
     initializeFields(null, title, url, user, date, rating);
+  }
+
+  public Recipe(User user) {
+    this.setStatus(Status.DIRTY);
+    this.user = user;
+    this.ingredients = new ArrayList<IngredientRecipe>();
+    this.instructions = new ArrayList<Instruction>();
+    initializeFields(null, null, null, user, null, null);
   }
 
   private void initializeFields(
@@ -37,16 +52,36 @@ public class Recipe extends Entity {
   }
 
   public void addIngredient(Ingredient ingredient, Integer amount, String unit) {
-    Ingredient_Recipe ingredient_recipe = new Ingredient_Recipe((Long) this.getValue("rid"), ingredient, amount, unit);
+    IngredientRecipe ingredient_recipe = new IngredientRecipe((Long) this.getValue("rid"), ingredient, amount, unit);
     this.ingredients.add(ingredient_recipe);
   }
 
+  public void addAllIngredients(List<IngredientRecipe> ingredientRecipes) {
+    ingredients.addAll(ingredientRecipes);
+  }
+
+  public void addAllInstructions(List<Instruction> instructions) {
+    instructions.addAll(instructions);
+  }
+
   public void removeIngredient(Ingredient ingredient) {
-    for (Ingredient_Recipe i : this.ingredients) {
+    for (IngredientRecipe i : this.ingredients) {
       if (i.equals(ingredient)) {
         i.setStatus(Status.DELETED_LOCALLY);
       }
     }
+  }
+
+  public User getUser() {
+    return user;
+  }
+
+  public List<IngredientRecipe> getIngredients() {
+    return ingredients;
+  }
+
+  public List<Instruction> getInstructions() {
+    return instructions;
   }
 
   public String getTableName() {

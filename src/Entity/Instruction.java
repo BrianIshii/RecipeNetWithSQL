@@ -13,6 +13,11 @@ public class Instruction extends Entity {
     initializeFields(null, rid, step, description);
   }
 
+  public Instruction(Long rid) {
+    this.setStatus(Status.NEW);
+    initializeFields(null, rid, null, null);
+  }
+
   private void initializeFields(Long instrid, Long rid, Integer step, String description) {
     addField(new Field<>(Long.class, "instrid", instrid == null ? 0L : instrid, true));
     addField(new Field<>(Long.class, "rid", rid, false));

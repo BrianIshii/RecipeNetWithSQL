@@ -1,68 +1,61 @@
 package Service;
 
-import Entity.Entity;
 import Entity.Field;
-import Entity.Status;
 
 import java.lang.reflect.Method;
+import java.sql.Date;
 import java.sql.*;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class ExecutorService {
-  // PS setters
-  private static Method setLong;
-  private static Method setString;
-  private static Method setInt;
-  private static Method setDate;
-
-  // RS getters
-  private static Method getLong;
-  private static Method getString;
-  private static Method getInt;
-  private static Method getDate;
-
-  // Execute
-  private static Method executeUpdate;
-  private static Method executeQuery;
-
-  private static List<Class> methodTypes;
-  private static List<Method> getters;
-  private static List<Method> setters;
+  private static Map<Class, Method> getters;
+  private static Map<Class, Method> setters;
 
   private static ExecutorService instance = new ExecutorService();
 
   private static Connection con = DatabaseConnection.getInstance().getConnection();
 
   private ExecutorService() {
+    getters = new HashMap<>();
+    setters = new HashMap<>();
     try {
       // PS setters
-      setLong = PreparedStatement.class.getDeclaredMethod("setLong", int.class, long.class);
-      setString = PreparedStatement.class.getDeclaredMethod("setString", int.class, String.class);
-      setInt = PreparedStatement.class.getDeclaredMethod("setInt", int.class, int.class);
-      setDate = PreparedStatement.class.getDeclaredMethod("setDate", int.class, Date.class);
+      setters.put(
+          Long.class, PreparedStatement.class.getDeclaredMethod("setLong", int.class, long.class));
+      setters.put(
+          String.class,
+          PreparedStatement.class.getDeclaredMethod("setString", int.class, String.class));
+      setters.put(
+          Integer.class, PreparedStatement.class.getDeclaredMethod("setInt", int.class, int.class));
+      setters.put(
+          java.util.Date.class,
+          PreparedStatement.class.getDeclaredMethod("setDate", int.class, Date.class));
 
       // RS getters
-      getLong = ResultSet.class.getDeclaredMethod("getLong", String.class);
-      getString = ResultSet.class.getDeclaredMethod("getString", String.class);
-      getInt = ResultSet.class.getDeclaredMethod("getInt", String.class);
-      getDate = ResultSet.class.getDeclaredMethod("getDate", String.class);
-
-      executeUpdate = PreparedStatement.class.getDeclaredMethod("executeUpdate");
-      executeQuery = PreparedStatement.class.getDeclaredMethod("executeQuery");
+      getters.put(Long.class, ResultSet.class.getDeclaredMethod("getLong", String.class));
+      getters.put(String.class, ResultSet.class.getDeclaredMethod("getString", String.class));
+      getters.put(Integer.class, ResultSet.class.getDeclaredMethod("getInt", String.class));
+      getters.put(Date.class, ResultSet.class.getDeclaredMethod("getDate", String.class));
 
     } catch (NoSuchMethodException nsme) {
       throw new RuntimeException(nsme);
     }
-    methodTypes = Arrays.asList(Long.class, String.class, Date.class, Integer.class);
-    getters = Arrays.asList(getLong, getString, getDate, getInt);
-    setters = Arrays.asList(setLong, setString, setDate, setInt);
   }
 
   public static ExecutorService getInstance() {
     return instance;
   }
 
+  /**
+   * Will extract the generated values from a PreparedStatement and mutate the given primary keys to
+   * contain the new values.
+   *
+   * <p>Note: will currently only work with Longs.
+   *
+   * @param ps
+   * @param primaryKeys
+   * @return
+   */
   private static boolean extractAndSetPK(PreparedStatement ps, List<Field> primaryKeys) {
     try {
       ResultSet generatedKeys = ps.getGeneratedKeys();
@@ -78,6 +71,13 @@ public class ExecutorService {
     return false;
   }
 
+  /**
+   * Applies the given fields to a statement starting with the given index.
+   *
+   * @param ps
+   * @param startIndex
+   * @param fields
+   */
   private static void applyFieldsToStatement(
       PreparedStatement ps, int startIndex, List<Field> fields) {
     try {
@@ -91,135 +91,149 @@ public class ExecutorService {
     }
   }
 
-  private static Object applyGet(ResultSet rs, Class c, String columnName) {
+  private static <T> T applyGet(ResultSet rs, Class<T> valueType, String columnName) {
     try {
-      for (int i = 0; i < methodTypes.size(); i++) {
-        Class m = methodTypes.get(i);
-        if (c.equals(m)) {
-          return getters.get(i).invoke(rs, columnName);
-        }
-      }
-      throw new IllegalArgumentException(String.format("Class of type %s is not supported", c));
+      Method method = getters.get(valueType);
+      if (method == null)
+        throw new RuntimeException(String.format("Class %s is not supported", valueType));
+      return (T) method.invoke(rs, columnName);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
 
-  private static void applySet(PreparedStatement ps, Class c, Object value, int index) {
+  private static <T> void applySet(PreparedStatement ps, Class<T> valueClass, T value, int index) {
     try {
-      for (int i = 0; i < methodTypes.size(); i++) {
-        Class m = methodTypes.get(i);
-        if (c.equals(m)) {
-          setters.get(i).invoke(ps, index, value);
-          return;
-        }
-      }
-      throw new IllegalArgumentException(String.format("Class of type %s is not supported", c));
+      Method method = setters.get(valueClass);
+      if (method == null)
+        throw new RuntimeException(String.format("Class %s is not supported", valueClass));
+      method.invoke(ps, index, value);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
 
-  public <E extends Entity> E executeInsert(E entity) {
-    String baseQuery = QueryFormatter.getInsertQuery(entity);
+  /**
+   * Inserts fields into the databause under the table and populates fieldsToPopulate with the new
+   * generated keys.
+   *
+   * @param tableName
+   * @param fieldsToPopulate
+   * @param fieldsToInsert
+   * @return
+   */
+  public List<Field> executeInsert(
+      String tableName, List<Field> fieldsToPopulate, List<Field> fieldsToInsert) {
     try {
-      PreparedStatement ps = con.prepareStatement(baseQuery, Statement.RETURN_GENERATED_KEYS);
-      applyFieldsToStatement(ps, 1, entity.getNonPrimaryFields());
+      String query = QueryFormatter.getInsertQuery(tableName, fieldsToInsert);
+      PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+      applyFieldsToStatement(ps, 1, fieldsToInsert);
       System.out.println(ps.toString());
       int affectedRows = ps.executeUpdate();
-      if (affectedRows == 0) entity.setStatus(Status.INVALID);
-      else
-        entity.setStatus(
-            extractAndSetPK(ps, entity.getPrimaryKey()) ? Status.UP_TO_DATE : Status.INVALID);
-      ps.close();
+      if (affectedRows == 0) return null;
+      if (extractAndSetPK(ps, fieldsToPopulate)) {
+        ps.close();
+        return fieldsToPopulate;
+      }
     } catch (SQLException sqle) {
       if (sqle.getMessage().contains("Duplicate")) {
-        return executeFetchByBodyMatch(entity);
+        System.err.println(sqle.getMessage());
+        return null;
       } else {
         sqle.printStackTrace();
-        entity.setStatus(Status.INVALID);
       }
     }
-    return entity;
+    return null;
   }
 
-  public <E extends Entity> E executeDelete(E entity) {
-    String baseQuery = QueryFormatter.getDeleteQuery(entity);
+  /**
+   * Deletes a tuple with a matching fields.
+   *
+   * @param tableName
+   * @param fieldsWhere
+   * @return
+   */
+  public boolean executeDelete(String tableName, List<Field> fieldsWhere) {
     try {
-      PreparedStatement ps = con.prepareStatement(baseQuery);
-      applyFieldsToStatement(ps, 1, entity.getPrimaryKey());
-      System.out.println(ps.toString());
-      entity.setStatus(ps.executeUpdate() > 0 ? Status.DELETED_FROM_REMOTE : Status.DIRTY);
-      ps.close();
-    } catch (SQLException sqle) {
-      sqle.printStackTrace();
-      entity.setStatus(Status.DIRTY);
-    }
-    return entity;
-  }
-
-  public <E extends Entity> E executeFetchByPK(E entity) {
-    List<Field> fieldsToCompare = entity.getPrimaryKey();
-    String baseQuery = QueryFormatter.getSelectByFieldsQuery(entity, fieldsToCompare);
-    return executeAndPopulate(entity, baseQuery, fieldsToCompare);
-  }
-
-  public <E extends Entity> E executeFetchByBodyMatch(E entity) {
-    List<Field> fieldsToCompare = entity.getNonPrimaryFields();
-    fieldsToCompare.removeIf(f -> f.getValue() == null); // Will not compare field if it is null
-    String baseQuery = QueryFormatter.getSelectByFieldsQuery(entity, fieldsToCompare);
-    return executeAndPopulate(entity, baseQuery, fieldsToCompare);
-  }
-
-  public <E extends Entity> E executeFetch(E entity, List<Field> fields) {
-    String baseQuery = QueryFormatter.getSelectByFieldsQuery(entity, fields);
-    return executeAndPopulate(entity, baseQuery, fields);
-  }
-
-  private <E extends Entity> E executeAndPopulate(
-      E entity, String query, List<Field> fieldsToCompare) {
-    try {
+      String query = QueryFormatter.getDeleteQuery(tableName, fieldsWhere);
       PreparedStatement ps = con.prepareStatement(query);
-      applyFieldsToStatement(ps, 1, fieldsToCompare);
+      applyFieldsToStatement(ps, 1, fieldsWhere);
       System.out.println(ps.toString());
-      ResultSet resultSet = (ResultSet) executeQuery.invoke(ps);
-
-      // Populate the entity with the new data
-      if (resultSet.next()) {
-        for (Field f : entity.getFields()) {
-          f.setValue(applyGet(resultSet, f.getValueType(), f.getKey()));
-        }
-        entity.setStatus(Status.UP_TO_DATE);
-      } else {
-        entity.setStatus(Status.INVALID);
-      }
+      int affectedRows = ps.executeUpdate();
       ps.close();
+      return affectedRows > 0;
     } catch (SQLException sqle) {
       sqle.printStackTrace();
-      entity.setStatus(Status.INVALID);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+      return false;
     }
-    return entity;
   }
 
-  public <E extends Entity> E executeUpdate(E entity) {
-    String baseQuery = QueryFormatter.getUpdateQuery(entity);
-    List<Field> fields = entity.getNonPrimaryFields();
-    fields.addAll(entity.getPrimaryKey());
+  /**
+   * Fetches an entity from the database using a search for the given fields.
+   *
+   * @param tableName
+   * @param fieldsToExpect
+   * @param fieldsWhere
+   * @return
+   */
+  public List<List<Field>> executeSelect(
+      String tableName, List<Field> fieldsToExpect, List<Field> fieldsWhere) {
     try {
-      PreparedStatement ps = con.prepareStatement(baseQuery);
-      applyFieldsToStatement(ps, 1, fields);
+      String query = QueryFormatter.getSelectQuery(tableName, fieldsToExpect, fieldsWhere);
+      PreparedStatement ps = con.prepareStatement(query);
+      if(fieldsWhere != null)
+        applyFieldsToStatement(ps, 1, fieldsWhere);
       System.out.println(ps.toString());
-      Integer rowsAffected = (Integer) executeUpdate.invoke(ps);
-      entity.setStatus(rowsAffected > 0 ? Status.UP_TO_DATE : Status.INVALID);
+
+      ResultSet rs = ps.executeQuery();
+      // Populate a list of lists of fields with all the results
+      List<List<Field>> allResults = new LinkedList<>();
+      while (rs.next()) {
+        List<Field> currentResult = new ArrayList<Field>();
+        Field newField;
+        for (Field f : fieldsToExpect) {
+          Object extractedValue = applyGet(rs, f.getValueType(), f.getKey());
+          newField = new Field(f.getValueType(), f.getKey(), extractedValue);
+          currentResult.add(newField);
+        }
+        allResults.add(currentResult);
+      }
       ps.close();
+      return allResults;
     } catch (SQLException sqle) {
       sqle.printStackTrace();
-      entity.setStatus(Status.INVALID);
+      return null;
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    return entity;
+  }
+
+  public List<List<Field>> executeSelect(
+      String tableName, List<Field> fieldsToExpect, Field... fieldsWhere) {
+    return executeSelect(tableName, fieldsToExpect, Arrays.asList(fieldsWhere));
+  }
+
+  public List<List<Field>> executeSelect(
+          String tableName, List<Field> fieldsToExpect) {
+    return executeSelect(tableName, fieldsToExpect, new LinkedList<>());
+  }
+
+  public boolean executeUpdate(String tableName, List<Field> fieldsToSet, List<Field> fieldsWhere) {
+    try {
+      String query = QueryFormatter.getUpdateQuery(tableName, fieldsToSet, fieldsWhere);
+      PreparedStatement ps = con.prepareStatement(query);
+      applyFieldsToStatement(ps, 1, fieldsToSet);
+      applyFieldsToStatement(ps, 1 + fieldsToSet.size(), fieldsWhere);
+      System.out.println(ps.toString());
+
+      int affectedRows = ps.executeUpdate();
+      ps.close();
+      return affectedRows > 0;
+    } catch (SQLException sqle) {
+      sqle.printStackTrace();
+      return false;
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 }

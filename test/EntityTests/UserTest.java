@@ -12,7 +12,7 @@ import static EntityTests.Constants.NAME;
 import static EntityTests.Constants.PASSWORD;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UserTest {
+public class UserTest{
   User user;
 
   @BeforeEach
@@ -46,7 +46,7 @@ public class UserTest {
 
   @Test
   public void testSetValues() {
-    user.setStatus(Status.UP_TO_DATE);
+    user.setStatus(Status.SYNCED);
     user.setValue("name", "NEW");
     user.setValue("email", "INVALID");
     assertEquals("NEW", user.getValue("name"));

@@ -1,17 +1,40 @@
 package Service;
 
-import Entity.Entity;
+import Entity.Field;
+import Entity.Status;
+import Entity.User;
+
+import java.util.List;
 
 public class UserService extends EntityService {
-    protected <E extends Entity> E create(E entity) {
-        return null;
-    }
+  private static UserService ourInstance = new UserService();
 
-    protected <E extends Entity> E commit(E entity) {
-        return null;
-    }
+  public static UserService getInstance() {
+    return ourInstance;
+  }
 
-    protected <E extends Entity> E remove(E entity) {
-        return null;
+  private UserService() {}
+
+  /**
+   * Returns a fully populated User.
+   *
+   * @param email
+   * @param password
+   * @return
+   */
+  public User authenticate(String email, String password) {
+    User user = new User(email, password);
+    List<List<Field>> extractedFields =
+        executorService.executeSelect(
+            User.TABLE_NAME, user.getFields(), user.getField("email"), user.getField("password"));
+    if (extractedFields.size() == 0) {
+      System.out.println(
+          String.format("Credentials username: %s, password: %s were not found", email, password));
+      return null;
     }
+    Field.applyTo(extractedFields.get(0), user.getFields(), true);
+
+    user.setStatus(Status.SYNCED);
+    return user;
+  }
 }

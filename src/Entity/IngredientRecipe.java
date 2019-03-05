@@ -1,16 +1,22 @@
 package Entity;
 
-public class Ingredient_Recipe extends Entity {
+public class IngredientRecipe extends Entity {
   public static final String TABLE_NAME = "Ingredient_Recipe";
   private Long rid;
   private Ingredient ingredient;
   private Integer amount;
   private String unit;
 
-  public Ingredient_Recipe(Long rid, Ingredient ingredient, Integer amount, String unit) {
+  public IngredientRecipe(Long rid, Ingredient ingredient, Integer amount, String unit) {
     this.setStatus(Status.DIRTY);
     this.ingredient = ingredient;
     initializeFields(rid, ingredient, amount, unit);
+  }
+
+  public IngredientRecipe(Long rid, Ingredient ingredient) {
+    this.setStatus(Status.NEW);
+    this.ingredient = ingredient;
+    initializeFields(rid, ingredient, null, null);
   }
 
   private void initializeFields(Long rid, Ingredient ingredient, Integer amount, String unit) {
