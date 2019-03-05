@@ -22,11 +22,11 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Username: " />
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Email:" />
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Password:" GridPane.rowIndex="1" />
-            <PasswordField GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <PasswordField fx:id="password" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <Button mnemonicParsing="false" onAction="#pressButton" text="Button" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <TextField GridPane.columnIndex="1" />
+            <TextField fx:id="email" GridPane.columnIndex="1" />
          </children>
       </GridPane>
    </children>
