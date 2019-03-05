@@ -23,7 +23,7 @@ public class RecipeService extends EntityService {
     Recipe temp = new Recipe(user);
 
     List<List<Field>> extractedFields =
-        executorService.executeSelect(Recipe.TABLE_NAME, temp.getFields(), temp.getField("user"));
+        executorService.executeSelect(Recipe.TABLE_NAME, temp.getFields(), temp.getField("uid"));
     List<Recipe> recipes = new ArrayList<Recipe>();
     for (List<Field> fieldGroup : extractedFields) {
       temp = new Recipe(user);
