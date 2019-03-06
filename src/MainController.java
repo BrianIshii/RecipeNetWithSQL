@@ -1,5 +1,6 @@
 
 import Entity.User;
+import Service.DatabaseConnection;
 import Service.UserService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -11,6 +12,8 @@ import javafx.scene.control.TextField;
 import java.io.IOException;
 
 public class MainController {
+    DatabaseConnection connection = DatabaseConnection.getInstance();
+    public static String FXML = "MainController.fxml";
 
     @FXML
     private TextField emailTextField;
@@ -19,6 +22,12 @@ public class MainController {
 
     private UserService userService = UserService.getInstance();
 
+    @FXML
+    public void initialize() {
+        if (connection.getConnection() != null) {
+            System.out.println("working");
+        }
+    }
     @FXML
     public void loginButtonPressed(ActionEvent event) throws IOException {
         // Login

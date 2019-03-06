@@ -9,7 +9,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Main extends Application {
-  DatabaseConnection connection = DatabaseConnection.getInstance();
   private static Stage primaryStage = null;
   private static User user = null;
 
@@ -32,10 +31,6 @@ public class Main extends Application {
 
   @Override
   public void start(Stage primaryStage) throws Exception {
-    if (connection.getConnection() != null) {
-      System.out.println("working");
-    }
-
     this.primaryStage = primaryStage;
 
     Parent root = FXMLLoader.load(getClass().getResource("MainController.fxml"));
