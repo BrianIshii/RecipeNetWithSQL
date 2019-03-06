@@ -37,6 +37,7 @@ public class Main extends Application {
     }
 
     this.primaryStage = primaryStage;
+
     Parent root = FXMLLoader.load(getClass().getResource("MainController.fxml"));
     primaryStage.setTitle("OurSQL");
     primaryStage.setScene(new Scene(root, 600, 400));

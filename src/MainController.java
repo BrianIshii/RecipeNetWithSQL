@@ -25,9 +25,9 @@ public class MainController {
         User authenticatedUser = userService.authenticate(emailTextField.getText(), passwordTextField.getText());
 
         if (authenticatedUser != null) {
-            System.out.println(authenticatedUser);
 
             // Transition to home view
+            Main.setUser(authenticatedUser);
             Parent root = FXMLLoader.load(getClass().getResource("Home.fxml"));
             Main.getPrimaryStage().getScene().setRoot(root);
         } else {
