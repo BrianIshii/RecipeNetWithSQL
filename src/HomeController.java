@@ -16,8 +16,7 @@ public class HomeController {
     private UserService userService = UserService.getInstance();
     private RecipeService recipeService = RecipeService.getInstance();
     private User user = Main.getUser();
-    ObservableList<String> items = FXCollections.<String>observableArrayList("hi");
-    @FXML ListView<String> listView = new ListView<>(items);
+    @FXML ListView<String> listView = new ListView<>();
     @FXML private Text name;
 
     @FXML
@@ -34,9 +33,6 @@ public class HomeController {
         for(Recipe r : recipes) {
             listView.getItems().add((String)r.getField("title").getValue());
         }
-
-        items = FXCollections.observableArrayList(titles);
-
     }
 
     public void pressButton(ActionEvent event) {
