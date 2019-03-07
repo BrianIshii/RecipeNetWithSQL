@@ -43,6 +43,7 @@ public class Recipe extends Entity {
 
   private void initializeFields(
       Long rid, String title, String url, User user, Date date, Integer rating) {
+    Long uid  = user == null ? null : (Long)user.getValue("uid");
     addField(Long.class, "rid", rid == null ? 0L : rid, true);
     addField(String.class, "title", title, false);
     addField(String.class, "url", url, false);
@@ -57,11 +58,11 @@ public class Recipe extends Entity {
   }
 
   public void addAllIngredients(List<IngredientRecipe> ingredientRecipes) {
-    ingredients.addAll(ingredientRecipes);
+    this.ingredients.addAll(ingredientRecipes);
   }
 
   public void addAllInstructions(List<Instruction> instructions) {
-    instructions.addAll(instructions);
+    this.instructions.addAll(instructions);
   }
 
   public void removeIngredient(Ingredient ingredient) {

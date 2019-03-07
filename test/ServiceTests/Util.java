@@ -2,10 +2,14 @@ package ServiceTests;
 
 import Entity.*;
 import Service.DatabaseConnection;
+import Service.UserService;
+import Utilities.DateUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import static EntityTests.Constants.*;
 
@@ -61,7 +65,7 @@ public class Util {
         con.prepareStatement(
             String.format(
                 "INSERT INTO User (name, email, password) VALUES ('%s', '%s', '%s');",
-                NAME, EMAIL, PASSWORD));
+                USER_NAME, USER_EMAIL, USER_PASSWORD));
     ps.executeUpdate();
     ps.close();
   }
@@ -78,11 +82,36 @@ public class Util {
   }
 
   public static void initRecipes() throws SQLException {
+    clearInstructions();
     clearRecipes();
-    String template =
-        "INSERT INTO %s (title, url, uid, date, rating) VALUES ('New Recipe', 'URL', 1, '2019-01-01', 5)";
-    PreparedStatement ps = con.prepareStatement(String.format(template, Recipe.TABLE_NAME));
+
+    initUsers();
+    User user = UserService.getInstance().authenticate(USER_EMAIL, USER_PASSWORD);
+    String date = DateUtils.dateToString(RECIPE_DATE);
+    String query =
+        String.format(
+            "INSERT INTO %s (title, url, uid, date, rating) VALUES ('%s', '%s', %s, '%s', %s)",
+            Recipe.TABLE_NAME, RECIPE_TITLE, RECIPE_URL, user.getValue("uid"), date, RECIPE_RATING);
+
+    PreparedStatement ps = con.prepareStatement(query);
     ps.executeUpdate();
     ps.close();
+  }
+
+  public static void initInstructions(Long rid) throws SQLException {
+    int step = 1;
+    String query;
+    for (String desc : INSTRUCTIONS) {
+      query = String.format("INSERT INTO %s (rid, step, description) VALUES (%s, %s, '%s');", Instruction.TABLE_NAME,
+              rid, step, desc);
+      PreparedStatement ps = con.prepareStatement(query);
+      ps.executeUpdate();
+      ps.close();
+      step++;
+    }
+  }
+
+  public static void initIngredientRecipe(Long rid) throws SQLException {
+
   }
 }

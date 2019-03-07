@@ -28,8 +28,4 @@ public class User extends Entity {
   public String getTableName() {
     return TABLE_NAME;
   }
-
-  public String toString() {
-    return fields.toString();
-  }
 }

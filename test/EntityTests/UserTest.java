@@ -7,9 +7,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import static EntityTests.Constants.EMAIL;
-import static EntityTests.Constants.NAME;
-import static EntityTests.Constants.PASSWORD;
+import static EntityTests.Constants.USER_EMAIL;
+import static EntityTests.Constants.USER_NAME;
+import static EntityTests.Constants.USER_PASSWORD;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserTest{
@@ -17,7 +17,7 @@ public class UserTest{
 
   @BeforeEach
   public void beforeEach() {
-    user = new User(NAME, EMAIL, PASSWORD);
+    user = new User(USER_NAME, USER_EMAIL, USER_PASSWORD);
   }
 
   @Test
@@ -33,9 +33,9 @@ public class UserTest{
 
   @Test
   public void checkValues() {
-    assertEquals(NAME, user.getValue("name"));
-    assertEquals(EMAIL, user.getValue("email"));
-    assertEquals(PASSWORD, user.getValue("password"));
+    assertEquals(USER_NAME, user.getValue("name"));
+    assertEquals(USER_EMAIL, user.getValue("email"));
+    assertEquals(USER_PASSWORD, user.getValue("password"));
   }
 
   @Test
@@ -56,7 +56,7 @@ public class UserTest{
 
   @Test
   public void testGetField() {
-    Field field = new Field<>(String.class, "name", NAME, false);
+    Field field = new Field<>(String.class, "name", USER_NAME, false);
     field.setColumn(2);
     assertEquals(field, user.getField("name"));
   }

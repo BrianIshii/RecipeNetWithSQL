@@ -6,6 +6,8 @@ import java.lang.reflect.Method;
 import java.sql.Date;
 import java.sql.*;
 import java.util.*;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 public class ExecutorService {
   private static Map<Class, Method> getters;

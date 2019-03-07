@@ -24,7 +24,7 @@ public abstract class EntityService {
         }
     }
 
-    public <E extends Entity> boolean delete(E entity) {
+    protected  <E extends Entity> boolean delete(E entity) {
         List<Field> primaryFields = entity.getPrimaryKey();
         return executorService.executeDelete(entity.getTableName(), primaryFields);
     }

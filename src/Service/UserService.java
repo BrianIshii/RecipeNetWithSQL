@@ -37,4 +37,6 @@ public class UserService extends EntityService {
     user.setStatus(Status.SYNCED);
     return user;
   }
+
+  // TODO list all users
 }

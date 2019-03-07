@@ -91,11 +91,15 @@ public abstract class Entity {
     this.status = status;
   }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Entity entity = (Entity) o;
-        return Field.compareFields(fields, entity.fields);
-    }
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Entity entity = (Entity) o;
+    return Field.compareFields(fields, entity.fields);
+  }
+
+  public String toString() {
+    return fields.toString();
+  }
 }

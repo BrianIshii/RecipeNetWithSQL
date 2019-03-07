@@ -7,9 +7,12 @@ import Entity.User;
 import Service.IngredientService;
 import Service.RecipeService;
 import Service.UserService;
+import Utilities.DateUtils;
 import org.junit.jupiter.api.*;
 
+import javax.sound.midi.SysexMessage;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 
 import static EntityTests.Constants.*;
@@ -34,59 +37,67 @@ public class ServiceTests {
   class UserServiceTest {
     @BeforeEach
     void beforeEach() throws SQLException {
+      Util.clearDB();
       Util.initUsers();
     }
 
     @Test
     void saveUser() throws SQLException {
       Util.clearUsers();
-      user = userService.save(new User(NAME, EMAIL, PASSWORD));
+
+      user = userService.save(new User(USER_NAME, USER_EMAIL, USER_PASSWORD));
       assertNotNull(user);
       assertNotNull(user.getValue("uid"));
-      assertEquals(NAME, user.getValue("name"));
-      assertEquals(EMAIL, user.getValue("email"));
-      assertEquals(PASSWORD, user.getValue("password"));
+      assertEquals(USER_NAME, user.getValue("name"));
+      assertEquals(USER_EMAIL, user.getValue("email"));
+      assertEquals(USER_PASSWORD, user.getValue("password"));
     }
+
     @Test
     void authenticateUser() {
-      user = userService.authenticate(EMAIL, PASSWORD);
+      user = userService.authenticate(USER_EMAIL, USER_PASSWORD);
       assertNotNull(user);
       assertEquals(Status.SYNCED, user.getStatus());
       assertNotNull(user.getValue("uid"));
-      assertEquals(NAME, user.getValue("name"));
-      assertEquals(EMAIL, user.getValue("email"));
-      assertEquals(PASSWORD, user.getValue("password"));
+      assertEquals(USER_NAME, user.getValue("name"));
+      assertEquals(USER_EMAIL, user.getValue("email"));
+      assertEquals(USER_PASSWORD, user.getValue("password"));
     }
 
     @Test
     void updateUser() {
       final String newName = "rubbish";
-      user = userService.authenticate(EMAIL, PASSWORD);
+      user = userService.authenticate(USER_EMAIL, USER_PASSWORD);
       assertNotNull(user, "Able to authenticate user");
+
       user.setValue("name", newName);
       assertEquals(Status.DIRTY, user.getStatus());
+
       user = userService.save(user);
       assertEquals(Status.SYNCED, user.getStatus());
 
       // Make sure the changes showed up
-      user = userService.authenticate(EMAIL, PASSWORD);
+      user = userService.authenticate(USER_EMAIL, USER_PASSWORD);
       assertNotNull(user);
       assertNotNull(user.getValue("uid"));
       assertEquals(newName, user.getValue("name"));
-      assertEquals(EMAIL, user.getValue("email"));
-      assertEquals(PASSWORD, user.getValue("password"));
+      assertEquals(USER_EMAIL, user.getValue("email"));
+      assertEquals(USER_PASSWORD, user.getValue("password"));
     }
 
     @Test
     void deleteUser() {
-      user = userService.authenticate(EMAIL, PASSWORD);
+      user = userService.authenticate(USER_EMAIL, USER_PASSWORD);
       assertNotNull(user);
-      assertTrue(userService.delete(user));
+      user.setStatus(Status.DELETED_LOCALLY);
+
+      assertNull(userService.save(user));
     }
 
     @Test
     void saveLocallyDeletedUser() {
-      user = userService.authenticate(EMAIL, PASSWORD);
+      user = userService.authenticate(USER_EMAIL, USER_PASSWORD);
+
       user.setStatus(Status.DELETED_LOCALLY);
       assertNull(userService.save(user));
     }
@@ -96,7 +107,7 @@ public class ServiceTests {
   @DisplayName("Ingredient Service")
   class IngredientServiceTest {
     @BeforeEach
-    void beforeEach() throws SQLException{
+    void beforeEach() throws SQLException {
       Util.initIngredients();
     }
 
@@ -130,18 +141,20 @@ public class ServiceTests {
     void searchAllIngredients() {
       List<Ingredient> ingredients = ingredientService.searchAll();
       assertEquals(INGREDIENTS.length, ingredients.size());
-      for(Ingredient i : ingredients) {
+      for (Ingredient i : ingredients) {
         assertEquals(Status.SYNCED, i.getStatus());
       }
     }
 
     @Test
     void deleteIngredient() {
-      //Load an ingredient
+      // Load an ingredient
       Ingredient ingredient = ingredientService.searchByName(INGREDIENTS[1]);
       assertNotNull(ingredient, "Ingredient was found");
 
-      assertTrue(ingredientService.delete(ingredient));
+      ingredient.setStatus(Status.DELETED_LOCALLY);
+
+      assertNull(ingredientService.save(ingredient));
     }
   }
 
@@ -149,16 +162,14 @@ public class ServiceTests {
   @DisplayName("Recipe Tests")
   class RecipeServiceTest {
     @BeforeEach
-    void beforeEach() throws SQLException{
+    void beforeEach() throws SQLException {
       Util.initIngredients();
-      Util.initUsers();
       Util.initRecipes();
     }
 
     @Test
     void searchByUser() {
-      User user = new User(NAME, EMAIL, PASSWORD);
-      user = userService.save(user);
+      User user = userService.authenticate(USER_EMAIL, USER_PASSWORD);
       assertNotNull(user);
 
       List<Recipe> recipes = recipeService.searchByUser(user);
@@ -166,20 +177,61 @@ public class ServiceTests {
       assertEquals(1, recipes.size());
       Recipe recipe = recipes.get(0);
       assertEquals(Status.SYNCED, recipe.getStatus());
-      assertEquals("New Recipe", recipe.getValue("title"));
-      assertNotNull(recipe.getValue("rid"));
+      assertEquals(RECIPE_TITLE, recipe.getValue("title"));
+      assertEquals(RECIPE_URL, recipe.getValue("url"));
+      assertEquals(user.getValue("uid"), recipe.getValue("uid"));
+      assertEquals(
+          DateUtils.dateToString(RECIPE_DATE),
+          DateUtils.dateToString((Date) recipe.getValue("date")));
+      assertEquals(RECIPE_RATING, recipe.getValue("rating"));
+      assertEquals(0, recipe.getIngredients().size(), "Does not fetch ingredients");
+      assertEquals(0, recipe.getIngredients().size(), "Does not fetch instructions");
+    }
+
+    @Test
+    void searchAll() {
+      List<Recipe> recipes = recipeService.searchAll();
+      assertNotNull(recipes);
+      assertEquals(1, recipes.size());
+      Recipe recipe = recipes.get(0);
+
+      assertEquals(Status.SYNCED, recipe.getStatus());
+      assertEquals(RECIPE_TITLE, recipe.getValue("title"));
+      assertEquals(RECIPE_URL, recipe.getValue("url"));
       assertNotNull(recipe.getValue("uid"));
-      assertNotNull(recipe.getValue("date"));
-      assertEquals(5, recipe.getValue("rating"));
+      assertEquals(
+              DateUtils.dateToString(RECIPE_DATE),
+              DateUtils.dateToString((Date) recipe.getValue("date")));
+      assertEquals(RECIPE_RATING, recipe.getValue("rating"));
+      assertEquals(0, recipe.getIngredients().size(), "Does not fetch ingredients");
+      assertEquals(0, recipe.getIngredients().size(), "Does not fetch instructions");
+    }
+
+    @Test
+    void saveRecipe() throws SQLException{
+      User user = userService.authenticate(USER_EMAIL, USER_PASSWORD);
+      assertNotNull(user);
+
+      Util.clearInstructions();
+      Util.clearRecipes();
+      Recipe recipe = new Recipe(RECIPE_TITLE, RECIPE_URL, user, RECIPE_DATE, RECIPE_RATING);
+    }
+
+    @Test
+    void searchByRid() throws SQLException {
+      //Get a recipe to search by
+      List<Recipe> recipes = recipeService.searchAll();
+      assertNotNull(recipes);
+      assertEquals(1, recipes.size(), "We have a recipe to test with");
+      Recipe recipe = recipes.get(0);
+      assertNotNull(recipe);
+      Util.initInstructions((Long)recipe.getValue("rid"));
+
+      Recipe foundRecipe = recipeService.searchById((Long)recipe.getValue("rid"));
+      assertEquals(Status.SYNCED, foundRecipe.getStatus());
+      assertNotNull(foundRecipe.getInstructions());
+      assertEquals(INSTRUCTIONS.length, foundRecipe.getInstructions().size());
+      //TODO check ingredients
     }
   }
-
-//  @Nested
-//  @DisplayName("Istruction Unit Tests")
-//  class InstructionServiceTest {
-//    @BeforeEach
-//    void beforeEach() {
-//
-//    }
-//  }
 }

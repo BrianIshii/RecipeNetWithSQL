@@ -46,5 +46,4 @@ public class IngredientService extends EntityService {
 
     return ingredients;
   }
-
 }

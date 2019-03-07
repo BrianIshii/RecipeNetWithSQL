@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class IngredientRecipeService extends EntityService {
-  private static final String RECIPE_INGREDIENTS_VIEW = "RecipeInIngredients";
+  private static final String RECIPE_INGREDIENTS_VIEW = "IngredientsInRecipe";
 
   private static IngredientRecipeService instance = new IngredientRecipeService();
 
@@ -35,7 +35,7 @@ public class IngredientRecipeService extends EntityService {
 
     List<List<Field>> fieldsExtracted =
         executorService.executeSelect(
-            Ingredient.TABLE_NAME, fieldsToExpect, searchKey);
+                RECIPE_INGREDIENTS_VIEW, fieldsToExpect, searchKey);
 
     List<IngredientRecipe> ingredients = new LinkedList<>();
     IngredientRecipe irTemp;
@@ -44,6 +44,7 @@ public class IngredientRecipeService extends EntityService {
       iTemp = new Ingredient(rid);
       Field.applyTo(fieldGroup, iTemp.getFields(), false);
       iTemp.setStatus(Status.SYNCED);
+
       irTemp = new IngredientRecipe(rid, iTemp);
       Field.applyTo(fieldGroup, irTemp.getFields(), false);
       irTemp.setStatus(Status.SYNCED);
