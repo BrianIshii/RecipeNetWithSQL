@@ -46,7 +46,7 @@ public class Recipe extends Entity {
     addField(Long.class, "rid", rid == null ? 0L : rid, true);
     addField(String.class, "title", title, false);
     addField(String.class, "url", url, false);
-    addField(Long.class, "uid", (Long) user.getPrimaryKey().get(0).getValue(), false);
+    addField(Long.class, "uid", user == null ? 0L : user.getPrimaryKey().get(0).getValue(), false);
     addField(Date.class, "date", date, false);
     addField(Integer.class, "rating", (Integer) rating, false);
   }
