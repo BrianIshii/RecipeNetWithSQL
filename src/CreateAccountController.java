@@ -5,26 +5,22 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.TextField;
+import java.util.regex.Pattern;
 
 import java.io.IOException;
 
 public class CreateAccountController {
 
-    @FXML
-    private TextField nameTextField;
-    @FXML
-    private TextField emailTextField;
-    @FXML
-    private TextField passwordTextField;
-    @FXML
-    private TextField confirmPasswordTextField;
+    @FXML private TextField nameTextField;
+    @FXML private TextField emailTextField;
+    @FXML private TextField passwordTextField;
+    @FXML private TextField confirmPasswordTextField;
 
     @FXML
     public void createAccountButtonPressed(ActionEvent event) throws IOException {
         // Check if passwords are the same
-        if (passwordTextField.getText().compareTo(confirmPasswordTextField.getText()) == 0) {
+        if (isValidInput()) {
             // Create user
             UserService userService = UserService.getInstance();
 
@@ -36,8 +32,7 @@ public class CreateAccountController {
             Parent root = FXMLLoader.load(getClass().getResource("Home.fxml"));
             Main.getPrimaryStage().getScene().setRoot(root);
         } else {
-            // Alarm that the passwords do not match
-            System.out.println("Passwords don't match");
+            System.out.println("User create account failed");
         }
     }
 
@@ -46,5 +41,41 @@ public class CreateAccountController {
         // Transition to main view
         Parent root = FXMLLoader.load(getClass().getResource("MainController.fxml"));
         Main.getPrimaryStage().getScene().setRoot(root);
+    }
+
+    private boolean isValidInput() {
+        // Check empty fields
+        if (nameTextField.getText().isEmpty() ||
+            emailTextField.getText().isEmpty() ||
+            passwordTextField.getText().isEmpty()) {
+            System.out.println("Field(s) cannot be empty");
+            return false;
+        }
+
+        // Check valid email
+        if (!isValidEmail(emailTextField.getText())) {
+            System.out.println("Email not valid");
+            return false;
+        }
+
+        // Check password match
+        if (passwordTextField.getText().compareTo(confirmPasswordTextField.getText()) != 0) {
+            System.out.println("Passwords don't match");
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
+                "[a-zA-Z0-9_+&*-]+)*@" +
+                "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
+                "A-Z]{2,7}$";
+
+        Pattern pat = Pattern.compile(emailRegex);
+        if (email == null)
+            return false;
+        return pat.matcher(email).matches();
     }
 }
