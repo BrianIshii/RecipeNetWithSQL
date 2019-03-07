@@ -10,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.text.Text;
 
@@ -17,15 +18,25 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeController {
-    private UserService userService = UserService.getInstance();
+public class HomeController extends BaseController {
+    public static String FXML = "Home.fxml";
     private RecipeService recipeService = RecipeService.getInstance();
     private User user = Main.getUser();
     @FXML ListView<String> listView = new ListView<>();
     @FXML private Text name;
+    @FXML private Button backButton;
+    @FXML private Button forwardButton;
+
+    public HomeController() {
+        super(FXML);
+    }
 
     @FXML
     public void initialize() {
+
+        backButton.setDisable(!canPressBackButton());
+        forwardButton.setDisable(!canPressForwardButton());
+
         user = Main.getUser();
         System.out.println(user);
 
@@ -44,20 +55,16 @@ public class HomeController {
         listView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                Parent root = null;
-                try {
-                    root = FXMLLoader.load(getClass().getResource(RecipeController.FXML));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                Main.getPrimaryStage().getScene().setRoot(root);
+                System.out.println(oldValue);
+                changeViewTo(RecipeController.FXML);
             }
         });
     }
 
     public void logoutButtonPressed(ActionEvent event) throws IOException {
-        Main.setUser(null);
-        Parent root = FXMLLoader.load(getClass().getResource(MainController.FXML));
-        Main.getPrimaryStage().getScene().setRoot(root);
+        logout();
     }
+
+
+
 }
