@@ -19,6 +19,9 @@ public class CreateAccountController {
 
     @FXML
     public void createAccountButtonPressed(ActionEvent event) throws IOException {
+        // Reset textfields' style
+        resetTextFieldsStyle();
+
         // Check if passwords are the same
         if (isValidInput()) {
             // Create user
@@ -49,18 +52,30 @@ public class CreateAccountController {
             emailTextField.getText().isEmpty() ||
             passwordTextField.getText().isEmpty()) {
             System.out.println("Field(s) cannot be empty");
+
+            if (nameTextField.getText().isEmpty()) alertTextField(nameTextField);
+            if (emailTextField.getText().isEmpty()) alertTextField(emailTextField);
+            if (passwordTextField.getText().isEmpty()) alertTextField(passwordTextField);
+
             return false;
         }
 
         // Check valid email
         if (!isValidEmail(emailTextField.getText())) {
             System.out.println("Email not valid");
+
+            alertTextField(emailTextField);
+
             return false;
         }
 
         // Check password match
         if (passwordTextField.getText().compareTo(confirmPasswordTextField.getText()) != 0) {
             System.out.println("Passwords don't match");
+
+            alertTextField(passwordTextField);
+            alertTextField(confirmPasswordTextField);
+
             return false;
         }
 
@@ -77,5 +92,16 @@ public class CreateAccountController {
         if (email == null)
             return false;
         return pat.matcher(email).matches();
+    }
+
+    private void alertTextField(TextField textField) {
+        textField.setStyle("-fx-text-box-border: red; -fx-focus-color: red;");
+    }
+
+    private void resetTextFieldsStyle() {
+        nameTextField.setStyle("");
+        emailTextField.setStyle("");
+        passwordTextField.setStyle("");
+        confirmPasswordTextField.setStyle("");
     }
 }
