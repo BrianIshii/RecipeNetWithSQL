@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 
 import java.io.IOException;
@@ -32,8 +33,6 @@ public class MainController {
     public void loginButtonPressed(ActionEvent event) throws IOException {
         // Login
         User authenticatedUser = userService.authenticate(emailTextField.getText(), passwordTextField.getText());
-        //User authenticatedUser = userService.authenticate("tester@test", "test");
-
 
         if (authenticatedUser != null) {
             // Transition to home view
@@ -42,7 +41,11 @@ public class MainController {
             Main.getPrimaryStage().getScene().setRoot(root);
         } else {
             // Alarm that the credentials are not valid
-            System.out.println("Credentials are not valid");
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("");
+            alert.setHeaderText(null);
+            alert.setContentText("Credentials are not valid");
+            alert.showAndWait();
         }
     }
 

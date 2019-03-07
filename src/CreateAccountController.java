@@ -1,4 +1,5 @@
 
+import Entity.Entity;
 import Entity.User;
 import Service.UserService;
 import javafx.event.ActionEvent;
@@ -31,20 +32,28 @@ public class CreateAccountController {
             UserService userService = UserService.getInstance();
 
             User newUser = new User(nameTextField.getText(), emailTextField.getText(), passwordTextField.getText());
-            userService.save(newUser);
+            Entity entity = userService.save(newUser);
 
-            // User create successfully message
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Information Dialog");
-            alert.setHeaderText(null);
-            alert.setContentText("Account create successfully!");
+            if (entity != null) {
+                // User create successfully message
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("");
+                alert.setHeaderText(null);
+                alert.setContentText("Account create successfully!");
+                alert.showAndWait();
 
-            alert.showAndWait();
-
-            // Transition to home view
-            Main.setUser(newUser);
-            Parent root = FXMLLoader.load(getClass().getResource("Home.fxml"));
-            Main.getPrimaryStage().getScene().setRoot(root);
+                // Transition to home view
+                Main.setUser(newUser);
+                Parent root = FXMLLoader.load(getClass().getResource("Home.fxml"));
+                Main.getPrimaryStage().getScene().setRoot(root);
+            } else {
+                // Something went wrong
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("");
+                alert.setHeaderText(null);
+                alert.setContentText("Something went wrong");
+                alert.showAndWait();
+            }
         } else {
             System.out.println("User create account failed");
         }
