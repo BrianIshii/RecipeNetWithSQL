@@ -18,10 +18,9 @@
        <ToolBar prefHeight="40.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
            <items>
                <Button fx:id="backButton" mnemonicParsing="false" onAction="#backButtonPressed" text="&lt;" />
+               <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#forwardButtonPressed" text="&gt;" AnchorPane.rightAnchor="0.0" />
                <Separator prefWidth="200.0" />
                <Button fx:id="homeButton" mnemonicParsing="false" onAction="#homeButtonPressed" text="Home" />
-               <Separator prefWidth="200.0" />
-               <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#forwardButtonPressed" text="&gt;" AnchorPane.rightAnchor="0.0" />
            </items>
        </ToolBar>
    </children>

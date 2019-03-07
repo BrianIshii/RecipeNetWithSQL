@@ -32,6 +32,8 @@ public class MainController {
     public void loginButtonPressed(ActionEvent event) throws IOException {
         // Login
         User authenticatedUser = userService.authenticate(emailTextField.getText(), passwordTextField.getText());
+        //User authenticatedUser = userService.authenticate("tester@test", "test");
+
 
         if (authenticatedUser != null) {
             // Transition to home view
