@@ -28,9 +28,11 @@ public class CreateAccountController {
             // Create user
             UserService userService = UserService.getInstance();
 
-            userService.save(new User(nameTextField.getText(), emailTextField.getText(), passwordTextField.getText()));
+            User newUser= new User(nameTextField.getText(), emailTextField.getText(), passwordTextField.getText());
+            userService.save(newUser);
 
             // Transition to home view
+            Main.setUser(newUser);
             Parent root = FXMLLoader.load(getClass().getResource("Home.fxml"));
             Main.getPrimaryStage().getScene().setRoot(root);
         } else {

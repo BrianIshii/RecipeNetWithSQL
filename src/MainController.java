@@ -31,11 +31,9 @@ public class MainController {
     @FXML
     public void loginButtonPressed(ActionEvent event) throws IOException {
         // Login
-//        User authenticatedUser = userService.authenticate(emailTextField.getText(), passwordTextField.getText());
-        User authenticatedUser = userService.authenticate("tester@test", "test");
+        User authenticatedUser = userService.authenticate(emailTextField.getText(), passwordTextField.getText());
 
         if (authenticatedUser != null) {
-
             // Transition to home view
             Main.setUser(authenticatedUser);
             Parent root = FXMLLoader.load(getClass().getResource("Home.fxml"));
