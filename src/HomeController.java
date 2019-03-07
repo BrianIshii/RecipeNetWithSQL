@@ -1,31 +1,30 @@
 import Entity.Recipe;
 import Entity.User;
 import Service.RecipeService;
-import Service.UserService;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.text.Text;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class HomeController extends BaseController {
     public static String FXML = "Home.fxml";
+
     private RecipeService recipeService = RecipeService.getInstance();
+    private Map<String, Long> recipeNameToRecipeID = new HashMap<String, Long>();
     private User user = Main.getUser();
-    @FXML ListView<String> listView = new ListView<>();
+
     @FXML private Text name;
     @FXML private Button backButton;
     @FXML private Button forwardButton;
+    @FXML ListView<String> listView = new ListView<>();
 
     public HomeController() {
         super(FXML);
@@ -38,24 +37,20 @@ public class HomeController extends BaseController {
         forwardButton.setDisable(!canPressForwardButton());
 
         user = Main.getUser();
-        System.out.println(user);
-
-        name.setText("Welcome, " + ((String) user.getValue("name")));
+        name.setText("Welcome, " + (user.getValue("name")));
 
         List<Recipe> recipes = recipeService.searchByUser(user);
 
-        List<String> titles = new ArrayList<>();
-
-        ObservableList<String> recipeNames = FXCollections.observableArrayList();
-
         for(Recipe r : recipes) {
+            recipeNameToRecipeID.put((String)r.getField("title").getValue(), (Long)(r.getField("rid").getValue()));
             listView.getItems().add((String)r.getField("title").getValue());
         }
 
         listView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                System.out.println(oldValue);
+                //System.out.println(recipeNameToRecipeID.get(observable.getValue()));
+                RecipeController.recipeID = recipeNameToRecipeID.get(observable.getValue());
                 changeViewTo(RecipeController.FXML);
             }
         });

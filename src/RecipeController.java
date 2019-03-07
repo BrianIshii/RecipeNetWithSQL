@@ -5,7 +5,7 @@ import javafx.scene.control.Button;
 import java.io.IOException;
 
 public class RecipeController extends BaseController {
-   //public static String recipeID = '0';
+   public static Long recipeID = Long.valueOf(0);
     public static String FXML = "Recipe.fxml";
     @FXML private Button backButton;
     @FXML private Button forwardButton;
@@ -19,6 +19,8 @@ public class RecipeController extends BaseController {
 
         backButton.setDisable(!canPressBackButton());
         forwardButton.setDisable(!canPressForwardButton());
+
+
     }
     public void homeButtonPressed(ActionEvent event) throws IOException {
         changeViewTo(HomeController.FXML);
