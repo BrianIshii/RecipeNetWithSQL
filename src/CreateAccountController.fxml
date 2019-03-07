@@ -26,6 +26,7 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
                   <Label text="Name" GridPane.halignment="RIGHT">
@@ -71,6 +72,11 @@
                      </GridPane.margin>
                   </Label>
                   <PasswordField fx:id="confirmPasswordTextField" maxWidth="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="3" />
+                  <Label fx:id="errorLabel" maxWidth="250.0" text="Error Message" textFill="#c31b1b" visible="false" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                     <GridPane.margin>
+                        <Insets />
+                     </GridPane.margin>
+                  </Label>
                </children>
                <VBox.margin>
                   <Insets bottom="10.0" />

@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import java.util.regex.Pattern;
 
@@ -16,6 +17,7 @@ public class CreateAccountController {
     @FXML private TextField emailTextField;
     @FXML private TextField passwordTextField;
     @FXML private TextField confirmPasswordTextField;
+    @FXML private Label errorLabel;
 
     @FXML
     public void createAccountButtonPressed(ActionEvent event) throws IOException {
@@ -51,7 +53,8 @@ public class CreateAccountController {
         if (nameTextField.getText().isEmpty() ||
             emailTextField.getText().isEmpty() ||
             passwordTextField.getText().isEmpty()) {
-            System.out.println("Field(s) cannot be empty");
+            errorLabel.setText("Field(s) cannot be empty");
+            errorLabel.setVisible(true);
 
             if (nameTextField.getText().isEmpty()) alertTextField(nameTextField);
             if (emailTextField.getText().isEmpty()) alertTextField(emailTextField);
@@ -62,7 +65,8 @@ public class CreateAccountController {
 
         // Check valid email
         if (!isValidEmail(emailTextField.getText())) {
-            System.out.println("Email not valid");
+            errorLabel.setText("Email not valid");
+            errorLabel.setVisible(true);
 
             alertTextField(emailTextField);
 
@@ -71,7 +75,8 @@ public class CreateAccountController {
 
         // Check password match
         if (passwordTextField.getText().compareTo(confirmPasswordTextField.getText()) != 0) {
-            System.out.println("Passwords don't match");
+            errorLabel.setText("Passwords don't match");
+            errorLabel.setVisible(true);
 
             alertTextField(passwordTextField);
             alertTextField(confirmPasswordTextField);
@@ -103,5 +108,7 @@ public class CreateAccountController {
         emailTextField.setStyle("");
         passwordTextField.setStyle("");
         confirmPasswordTextField.setStyle("");
+
+        errorLabel.setVisible(false);
     }
 }
