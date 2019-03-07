@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import java.util.regex.Pattern;
@@ -29,8 +30,16 @@ public class CreateAccountController {
             // Create user
             UserService userService = UserService.getInstance();
 
-            User newUser= new User(nameTextField.getText(), emailTextField.getText(), passwordTextField.getText());
+            User newUser = new User(nameTextField.getText(), emailTextField.getText(), passwordTextField.getText());
             userService.save(newUser);
+
+            // User create successfully message
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Information Dialog");
+            alert.setHeaderText(null);
+            alert.setContentText("Account create successfully!");
+
+            alert.showAndWait();
 
             // Transition to home view
             Main.setUser(newUser);
