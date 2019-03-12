@@ -9,10 +9,14 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.control.ScrollPane?>
+
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="RecipeController">
    <children>
-      <VBox alignment="CENTER" layoutX="250.0" layoutY="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+       <ScrollPane prefHeight="200.0" prefWidth="200.0" AnchorPane.topAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.bottomAnchor="40.0">
+           <content>
+           <VBox alignment="CENTER" layoutX="250.0" layoutY="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
              <Label text="Recipe">
                <font>
@@ -45,16 +49,17 @@
                      <Insets bottom="10.0" left="20.0" right="20.0" />
                  </VBox.margin>
              </ListView>
-             <ToolBar prefHeight="40.0" prefWidth="200.0">
-                 <items>
-                     <Button fx:id="backButton" mnemonicParsing="false" onAction="#backButtonPressed" text="&lt;" />
-                     <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#forwardButtonPressed" text="&gt;" AnchorPane.rightAnchor="0.0" />
-                     <Separator prefWidth="200.0" visible="false" />
-                     <Button fx:id="homeButton" mnemonicParsing="false" onAction="#homeButtonPressed" text="Home" />
-                 </items>
-             </ToolBar>
-
          </children>
       </VBox>
+           </content>
+       </ScrollPane>
+       <ToolBar prefHeight="40.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+           <items>
+               <Button fx:id="backButton" mnemonicParsing="false" onAction="#backButtonPressed" text="&lt;" />
+               <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#forwardButtonPressed" text="&gt;" AnchorPane.rightAnchor="0.0" />
+               <Separator prefWidth="200.0" />
+               <Button fx:id="homeButton" mnemonicParsing="false" onAction="#homeButtonPressed" text="Home" />
+           </items>
+       </ToolBar>
    </children>
 </AnchorPane>
