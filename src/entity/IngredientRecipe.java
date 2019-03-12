@@ -4,12 +4,16 @@ import schema.Schema;
 
 public class IngredientRecipe extends Entity {
     public static final String TABLE_NAME = "Ingredient_Recipe";
+    public static final String RID ="rid";
+    public static final String IID = "iid";
+    public static final String AMOUNT = "amount";
+    public static final String UNIT = "unit";
     public static final Schema ENTITY_FIELDS =
             new Schema()
-                    .addField(Long.class, "rid", 0L, true)
-                    .addField(Long.class, "iid", 0L, true)
-                    .addField(Integer.class, "amount", null, false)
-                    .addField(String.class, "unit", null, false);
+                    .addField(Long.class, RID, 0L, true)
+                    .addField(Long.class, IID, 0L, true)
+                    .addField(Integer.class, AMOUNT, null, false)
+                    .addField(String.class, UNIT, null, false);
 
 
     private Ingredient ingredient;
@@ -27,10 +31,10 @@ public class IngredientRecipe extends Entity {
 
     private void initializeFields(Long rid, Ingredient ingredient, Integer amount, String unit) {
         fields = deepCopyFields(ENTITY_FIELDS);
-        setFieldValue("rid", rid);
-        setFieldValue("iid", ingredient.getFieldValue("iid"));
-        setFieldValue("amount", amount);
-        setFieldValue("unit", unit);
+        setFieldValue(RID, rid);
+        setFieldValue(IID, ingredient.getFieldValue("iid"));
+        setFieldValue(AMOUNT, amount);
+        setFieldValue(UNIT, unit);
         setNew();
     }
 

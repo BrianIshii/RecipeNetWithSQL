@@ -19,7 +19,7 @@ public class InstructionService extends EntityService {
   public List<Instruction> searchByRecipe(Long rid) {
       List<ResponseSchema> response =
         executorService.executeSelect(
-                Instruction.TABLE_NAME, Instruction.ENTITY_FIELDS, new Field<Long>(Long.class, "rid", rid, true));
+                Instruction.TABLE_NAME, Instruction.ENTITY_FIELDS, new Field<Long>(Long.class, Instruction.RID, rid, true));
 
     List<Instruction> instructions = new ArrayList<>();
       Instruction temp;
@@ -34,7 +34,7 @@ public class InstructionService extends EntityService {
   }
 
     public void clearRecipeInstructions(Long rid) {
-        executorService.executeDelete(Instruction.TABLE_NAME, new Field<>(Long.class, "rid", rid));
+        executorService.executeDelete(Instruction.TABLE_NAME, new Field<>(Long.class, Instruction.RID, rid));
     }
 
 }

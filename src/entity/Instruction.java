@@ -4,12 +4,16 @@ import schema.Schema;
 
 public class Instruction extends Entity {
   public static final String TABLE_NAME = "Instruction";
+  public static final String INSTRID = "instrid";
+  public static final String RID = "rid";
+  public static final String STEP = "step";
+  public static final String DESCRIPTION = "description";
   public static final Schema ENTITY_FIELDS =
       new Schema()
-          .addField(Long.class, "instrid", 0L, true)
-          .addField(Long.class, "rid", null, false)
-          .addField(Integer.class, "step", null, false)
-          .addField(String.class, "description", null, false);
+          .addField(Long.class, INSTRID, 0L, true)
+          .addField(Long.class, RID, null, false)
+          .addField(Integer.class, STEP, null, false)
+          .addField(String.class, DESCRIPTION, null, false);
 
   public Instruction(Long instrid, Long rid, Integer step, String description) {
     initializeFields(instrid, rid, step, description);
@@ -26,10 +30,10 @@ public class Instruction extends Entity {
 
   private void initializeFields(Long instrid, Long rid, Integer step, String description) {
     fields = deepCopyFields(ENTITY_FIELDS);
-    setFieldValue("instrid", instrid == null ? 0L : instrid);
-    setFieldValue("rid", rid);
-    setFieldValue("step", step);
-    setFieldValue("description", description);
+    setFieldValue(INSTRID, instrid == null ? 0L : instrid);
+    setFieldValue(RID, rid);
+    setFieldValue(STEP, step);
+    setFieldValue(DESCRIPTION, description);
     setNew();
   }
 
