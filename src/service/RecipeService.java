@@ -50,7 +50,7 @@ public class RecipeService extends EntityService {
         Recipe foundRecipe = new Recipe(rid);
         ResponseSchema response =
                 executorService
-                        .executeSelect(Recipe.TABLE_NAME, Recipe.ENTITY_FIELDS, foundRecipe.getPrimaryKeys())
+                        .executeSelect(Recipe.TABLE_NAME, Recipe.ENTITY_FIELDS, foundRecipe.getPrimaryFields())
                         .get(0);
         response.applyValuesTo(foundRecipe, true);
 

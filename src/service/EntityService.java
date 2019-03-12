@@ -43,7 +43,7 @@ public abstract class EntityService {
    * @return
    */
   protected <E extends Entity> boolean delete(E entity) {
-    List<Field> primaryFields = entity.getPrimaryKeys();
+    List<Field> primaryFields = entity.getPrimaryFields();
     return executorService.executeDelete(entity.getTableName(), primaryFields);
   }
 
@@ -57,8 +57,8 @@ public abstract class EntityService {
    * @return
    */
   protected <E extends Entity> E create(E entity) {
-    RequestSchema primaryFields = new RequestSchema(entity.getPrimaryKeys());
-    RequestSchema nonPrimaryFields = new RequestSchema(entity.getNonPrimaryKeys());
+    RequestSchema primaryFields = new RequestSchema(entity.getPrimaryFields());
+    RequestSchema nonPrimaryFields = new RequestSchema(entity.getNonPrimaryFields());
     ResponseSchema response =
             executorService.executeInsert(entity.getTableName(), primaryFields, nonPrimaryFields);
     if (response == null) return null;
@@ -76,8 +76,8 @@ public abstract class EntityService {
    * @return
    */
   protected <E extends Entity> E commit(E entity) {
-    RequestSchema primaryFields = new RequestSchema(entity.getPrimaryKeys());
-    RequestSchema nonPrimaryFields = new RequestSchema(entity.getNonPrimaryKeys());
+    RequestSchema primaryFields = new RequestSchema(entity.getPrimaryFields());
+    RequestSchema nonPrimaryFields = new RequestSchema(entity.getNonPrimaryFields());
     boolean status =
             executorService.executeUpdate(entity.getTableName(), nonPrimaryFields, primaryFields);
     if (status) entity.setSynced();

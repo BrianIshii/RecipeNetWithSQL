@@ -1,8 +1,17 @@
+import entity.Ingredient;
+import entity.IngredientRecipe;
 import entity.Recipe;
+import service.RecipeService;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import service.RecipeService;
+import javafx.scene.control.ListView;
+import javafx.scene.control.cell.CheckBoxListCell;
+import javafx.util.Callback;
 
 import java.io.IOException;
 
@@ -14,19 +23,43 @@ public class RecipeController extends BaseController {
 
     @FXML private Button backButton;
     @FXML private Button forwardButton;
+    @FXML ListView<String> ingredientsView = new ListView<>();
 
     public RecipeController() {
         super(FXML);
     }
 
-    @javafx.fxml.FXML
+    @FXML
     public void initialize() {
 
         backButton.setDisable(!canPressBackButton());
         forwardButton.setDisable(!canPressForwardButton());
 
         Recipe r = recipeService.searchById(recipeID);
-//        System.out.println(r);
+        for (IngredientRecipe i : r.getIngredients()) {
+            String ingredientInfo = (i.getField("amount").getValue() + " " + i.getField("unit").getValue());
+            ingredientsView.getItems().add(ingredientInfo);
+        }
+
+        ingredientsView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                System.out.println("selected");
+            }
+        });
+
+        ingredientsView.setCellFactory(CheckBoxListCell.forListView(new Callback<String, ObservableValue<Boolean>>() {
+            @Override
+            public ObservableValue<Boolean> call(String item) {
+                BooleanProperty observable = new SimpleBooleanProperty();
+                observable.addListener((obs, wasSelected, isNowSelected) ->
+                        System.out.println("Check box for "+item+" changed from "+wasSelected+" to "+isNowSelected)
+                );
+                return observable ;
+            }
+        }));
+
+        System.out.println(r);
     }
     public void homeButtonPressed(ActionEvent event) throws IOException {
         changeViewTo(HomeController.FXML);

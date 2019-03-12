@@ -40,7 +40,7 @@ public class UserTest{
 
   @Test
   public void checkPrimaryKey() {
-    String pkname = user.getPrimaryKeys().get(0).getKey();
+    String pkname = user.getPrimaryFields().get(0).getKey();
     assertEquals("uid", pkname);
   }
 
@@ -62,7 +62,7 @@ public class UserTest{
 
   @Test
   public void testGetNonPrimaryFields() {
-    List<Field> fields = user.getNonPrimaryKeys();
+    List<Field> fields = user.getNonPrimaryFields();
     assertEquals("name", fields.get(0).getKey());
     assertEquals("email", fields.get(1).getKey());
     assertEquals("password", fields.get(2).getKey());

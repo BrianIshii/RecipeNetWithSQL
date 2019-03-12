@@ -15,8 +15,8 @@ public class Util {
   private static Connection con = DatabaseConnection.getInstance().getConnection();
 
   public static void clearDB() throws SQLException {
-    clearIngredients();
     clearIngredientRecipes();
+    clearIngredients();
     clearInstructions();
     clearRecipes();
     clearUsers();

@@ -62,7 +62,7 @@ public class Schema {
         }
     }
 
-    public List<Field> getPrimaryKeys() {
+    public List<Field> getPrimaryFields() {
         List<Field> pks =
                 fields.stream()
                         .filter(f -> f.isPrimaryKey)
@@ -70,7 +70,7 @@ public class Schema {
         return pks;
     }
 
-    public List<Field> getNonPrimaryKeys() {
+    public List<Field> getNonPrimaryFields() {
         List<Field> nonPK =
                 fields.stream()
                         .filter(f -> !f.isPrimaryKey)
