@@ -4,10 +4,12 @@ import schema.Schema;
 
 public class Ingredient extends Entity {
   public static final String TABLE_NAME = "Ingredient";
+  public static final String IID = "iid";
+  public static final String NAME = "name";
   public static final Schema ENTITY_FIELDS =
       new Schema()
-          .addField(Long.class, "iid", null, true)
-          .addField(String.class, "name", null, false);
+          .addField(Long.class, IID, null, true)
+          .addField(String.class, NAME, null, false);
 
   public Ingredient(Long iid, String name) {
     initializeFields(iid, name);
@@ -28,8 +30,8 @@ public class Ingredient extends Entity {
 
   private void initializeFields(Long iid, String name) {
     fields = deepCopyFields(ENTITY_FIELDS);
-    this.setFieldValue("iid", iid == null ? 0L : iid);
-    this.setFieldValue("name", name);
+    this.setFieldValue(IID, iid == null ? 0L : iid);
+    this.setFieldValue(NAME, name);
     setNew();
   }
 

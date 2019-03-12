@@ -8,14 +8,20 @@ import java.util.List;
 
 public class Recipe extends Entity {
   public static final String TABLE_NAME = "Recipe";
+  public static final String RID = "rid";
+  public static final String TITLE = "title";
+  public static final String URL = "url";
+  public static final String UID = "uid";
+  public static final String DATE = "date";
+  public static final String RATING = "rating";
   public static final Schema ENTITY_FIELDS =
           new Schema()
-          .addField(Long.class, "rid", 0L, true)
-          .addField(String.class, "title", null, false)
-          .addField(String.class, "url", null, false)
-          .addField(Long.class, "uid", null, false)
-          .addField(Date.class, "date", null, false)
-          .addField(Integer.class, "rating", null, false);
+          .addField(Long.class, RID, 0L, true)
+          .addField(String.class, TITLE, null, false)
+          .addField(String.class, URL, null, false)
+          .addField(Long.class, UID, null, false)
+          .addField(Date.class, DATE, null, false)
+          .addField(Integer.class, RATING, null, false);
 
   private User user;
   private List<IngredientRecipe> ingredients;
@@ -55,12 +61,12 @@ public class Recipe extends Entity {
       Long rid, String title, String url, User user, Date date, Integer rating) {
     Long uid = user == null ? null : (Long) user.getFieldValue("uid");
     fields = deepCopyFields(ENTITY_FIELDS);
-    setFieldValue("rid", rid == null ? 0L : rid);
-    setFieldValue("title", title);
-    setFieldValue("url", url);
-    setFieldValue("uid", user == null ? null : user.getFieldValue("uid"));
-    setFieldValue("date", date);
-    setFieldValue("rating", rating);
+    setFieldValue(RID, rid == null ? 0L : rid);
+    setFieldValue(TITLE, title);
+    setFieldValue(URL, url);
+    setFieldValue(UID, user == null ? null : user.getFieldValue("uid"));
+    setFieldValue(DATE, date);
+    setFieldValue(RATING, rating);
     setNew();
   }
 

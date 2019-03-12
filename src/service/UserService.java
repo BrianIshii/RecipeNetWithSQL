@@ -28,7 +28,7 @@ public class UserService extends EntityService {
         User user = new User(email, password);
         List<ResponseSchema> response =
                 executorService.executeSelect(
-                        User.TABLE_NAME, User.ENTITY_FIELDS, user.getField("email"), user.getField("password"));
+                        User.TABLE_NAME, User.ENTITY_FIELDS, user.getField(User.UID), user.getField(User.PASSWORD));
         if (response.size() == 0) {
             System.out.println(
                     String.format("Credentials username: %s, password: %s were not found", email, password));
@@ -42,7 +42,7 @@ public class UserService extends EntityService {
     public List<User> fuzzyNameSearch(String name, int maxEditDistance) {
         List<ResponseSchema> response =
                 executorService.executeLevenshteinSelect(
-                        User.TABLE_NAME, User.ENTITY_FIELDS, "name", name, maxEditDistance);
+                        User.TABLE_NAME, User.ENTITY_FIELDS, User.NAME, name, maxEditDistance);
         if (response == null) {
             return new LinkedList<>();
         }

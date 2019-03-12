@@ -28,7 +28,7 @@ public class RecipeService extends EntityService {
   public List<Recipe> searchByUser(User user) {
     List<ResponseSchema> response =
         executorService.executeSelect(
-            Recipe.TABLE_NAME, Recipe.ENTITY_FIELDS, user.getField("uid"));
+            Recipe.TABLE_NAME, Recipe.ENTITY_FIELDS, user.getField(User.UID));
     List<Recipe> recipes = new ArrayList<Recipe>();
     Recipe temp;
     for (ResponseSchema res : response) {
@@ -92,14 +92,16 @@ public class RecipeService extends EntityService {
       Recipe temp = super.save(recipe);
       if (temp == null) return temp;
 
-      if(recipeStartStatus == Status.NEW) { //Need to apply generated rid prior to save
-          temp.getIngredients().stream().forEach(i -> i.setFieldValue("rid", temp.getFieldValue("rid")));
-          temp.getInstructions().stream().forEach(i -> i.setFieldValue("rid", temp.getFieldValue("rid")));
+      if (recipeStartStatus == Status.NEW) { // Need to apply generated rid prior to save
+        temp.getIngredients().stream()
+            .forEach(i -> i.setFieldValue(Recipe.RID, temp.getFieldValue(Recipe.RID)));
+        temp.getInstructions().stream()
+            .forEach(i -> i.setFieldValue(Recipe.RID, temp.getFieldValue(Recipe.RID)));
       }
 
       // Save any updates to children and cleanses lists of deleted values
       recipe.getIngredients().removeIf(ir -> ingredientRecipeService.save(ir) == null);
-      instructionService.clearRecipeInstructions((Long) recipe.getFieldValue("rid"));
+      instructionService.clearRecipeInstructions((Long) recipe.getFieldValue(Recipe.RID));
       int step = 1;
       for (Iterator<Instruction> iterator = recipe.getInstructions().iterator();
           iterator.hasNext(); ) {

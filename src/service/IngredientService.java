@@ -19,7 +19,7 @@ public class IngredientService extends EntityService {
     Ingredient ingredient = new Ingredient(name);
       List<ResponseSchema> response =
             executorService.executeSelect(Ingredient.TABLE_NAME,
-                    Ingredient.ENTITY_FIELDS, ingredient.getField("name"));
+                    Ingredient.ENTITY_FIELDS, ingredient.getField(Ingredient.NAME));
       if (response.size() == 0) {
       System.out.println(String.format("Could not find ingredient with name: %s", name));
       return null;

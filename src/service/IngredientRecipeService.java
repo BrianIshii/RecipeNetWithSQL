@@ -2,6 +2,8 @@ package service;
 
 import entity.Ingredient;
 import entity.IngredientRecipe;
+import entity.Instruction;
+import entity.Recipe;
 import schema.Field;
 import schema.RequestSchema;
 import schema.ResponseSchema;
@@ -22,17 +24,17 @@ public class IngredientRecipeService extends EntityService {
     }
 
     public List<IngredientRecipe> searchByRecipe(Long rid) {
-        // A list of fields that can be expected from the view
-        RequestSchema expected =
-                new RequestSchema()
-                        .addField(Long.class, "rid", null, true)
-                        .addField(Long.class, "iid", null, true)
-                        .addField(String.class, "name", null, false)
-                        .addField(Integer.class, "amount", null, false)
-                        .addField(String.class, "unit", null, false);
+    // A list of fields that can be expected from the view
+    RequestSchema expected =
+        new RequestSchema()
+            .addField(Long.class, Recipe.RID, null, true)
+            .addField(Long.class, Ingredient.IID, null, true)
+            .addField(String.class, Ingredient.NAME, null, false)
+            .addField(Integer.class, IngredientRecipe.AMOUNT, null, false)
+            .addField(String.class, IngredientRecipe.UNIT, null, false);
 
         // Key to use in the where clause
-        Field searchKey = new Field(Long.class, "rid", rid, true);
+        Field searchKey = new Field<Long>(Long.class, Recipe.RID, rid, true);
 
         List<ResponseSchema> response =
                 executorService.executeSelect(RECIPE_INGREDIENTS_VIEW, expected, searchKey);
