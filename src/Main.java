@@ -1,6 +1,4 @@
-import Entity.Recipe;
-import Entity.User;
-import Service.RecipeService;
+import entity.User;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

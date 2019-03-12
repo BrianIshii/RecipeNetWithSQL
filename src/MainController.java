@@ -1,14 +1,12 @@
-
-import Entity.User;
-import Service.DatabaseConnection;
-import Service.UserService;
+import entity.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
+import service.DatabaseConnection;
+import service.UserService;
 
 import java.io.IOException;
 

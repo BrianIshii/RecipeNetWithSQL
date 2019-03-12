@@ -1,9 +1,10 @@
-package Service;
+package service;
 
-import Entity.*;
+import entity.*;
+import formatter.Field;
+import schema.ResponseSchema;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -26,15 +27,14 @@ public class RecipeService extends EntityService {
    * @return
    */
   public List<Recipe> searchByUser(User user) {
-    Recipe temp = new Recipe(user);
-
-    List<List<Field>> extractedFields =
-        executorService.executeSelect(Recipe.TABLE_NAME, temp.getFields(), temp.getField("uid"));
+    List<ResponseSchema> response =
+        executorService.executeSelect(Recipe.TABLE_NAME, Recipe.ENTITY_FIELDS, user.getField("uid"));
     List<Recipe> recipes = new ArrayList<Recipe>();
-    for (List<Field> fieldGroup : extractedFields) {
+    Recipe temp;
+    for (ResponseSchema res : response) {
       temp = new Recipe(user);
-      Field.applyTo(fieldGroup, temp.getFields(), true);
-      temp.setStatus(Status.SYNCED);
+      res.applyValuesTo(temp, true);
+      temp.setSynced();
       recipes.add(temp);
     }
     return recipes;
@@ -48,11 +48,11 @@ public class RecipeService extends EntityService {
    */
   public Recipe searchById(Long rid) {
     Recipe foundRecipe = new Recipe(rid);
-    List<Field> extractedFields =
+    ResponseSchema response =
         executorService
-            .executeSelect(Recipe.TABLE_NAME, foundRecipe.getFields(), foundRecipe.getPrimaryKey())
+            .executeSelect(Recipe.TABLE_NAME, Recipe.ENTITY_FIELDS, foundRecipe.getPrimaryKeys())
             .get(0);
-    Field.applyTo(extractedFields, foundRecipe.getFields(), true);
+    response.applyValuesTo(foundRecipe, true);
 
     // Get the ingredients
     List<IngredientRecipe> ingredientRecipes = ingredientRecipeService.searchByRecipe(rid);
@@ -62,12 +62,13 @@ public class RecipeService extends EntityService {
     List<Instruction> instructions = instructionService.searchByRecipe(rid);
     foundRecipe.addAllInstructions(instructions);
 
-    foundRecipe.setStatus(Status.SYNCED);
+    foundRecipe.setSynced();
     return foundRecipe;
   }
 
   /**
-   * Saves both a recipe and any updates made to the children.
+   * Saves both a recipe and any updates made to the children. Deletes instructions prior to saving
+   * new ones to simplify things.
    *
    * @param recipe
    * @return
@@ -79,17 +80,24 @@ public class RecipeService extends EntityService {
           .forEach(ir -> ingredientRecipeService.delete(ir)); // Delete connections to ingredients
       recipe
           .getInstructions()
-          .forEach(i -> instructionService.delete(i)); // Delete its instructsions
+          .forEach(i -> instructionService.delete(i)); // Delete its instructions
       if (super.delete(recipe)) return null;
       else
         throw new RuntimeException(
             String.format(
                 "Recipe with title %s was marked for deletion but was not successfully deleted from the database.",
-                recipe.getValue("title")));
+                recipe.getFieldValue("title")));
     } else {
-      // Save any updates to children and cleanse lists of deleted values
+      // Save any updates to children and cleanses lists of deleted values
       recipe.getIngredients().removeIf(ir -> ingredientRecipeService.save(ir) == null);
-      recipe.getInstructions().removeIf(i -> instructionService.save(i) == null);
+      instructionService.clearRecipeInstructions((Long) recipe.getFieldValue("rid"));
+      int step = 1;
+      for (Iterator<Instruction> iterator = recipe.getInstructions().iterator();
+          iterator.hasNext(); ) {
+        Instruction i = iterator.next();
+        i.setFieldValue("step", step);
+        instructionService.save(i);
+      }
       return super.save(recipe);
     }
   }
@@ -100,15 +108,15 @@ public class RecipeService extends EntityService {
    * @return
    */
   public List<Recipe> searchAll() {
-    Recipe temp = new Recipe(0L); // Object with dummy value
-    List<List<Field>> extractedFields =
-        executorService.executeSelect(Recipe.TABLE_NAME, temp.getFields());
+    List<ResponseSchema> response =
+        executorService.executeSelect(Recipe.TABLE_NAME, Recipe.ENTITY_FIELDS);
 
     List<Recipe> recipes = new ArrayList<>();
-    for (List<Field> fieldGroup : extractedFields) {
+    Recipe temp;
+    for (ResponseSchema res : response) {
       temp = new Recipe(0L); // Another dummy initializer
-      Field.applyTo(fieldGroup, temp.getFields(), true);
-      temp.setStatus(Status.SYNCED);
+      res.applyValuesTo(temp, true);
+      temp.setSynced();
       recipes.add(temp);
     }
 

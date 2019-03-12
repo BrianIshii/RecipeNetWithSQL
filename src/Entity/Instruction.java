@@ -1,28 +1,36 @@
-package Entity;
+package entity;
+
+import schema.Schema;
 
 public class Instruction extends Entity {
   public static final String TABLE_NAME = "Instruction";
+  public static final Schema ENTITY_FIELDS =
+      new Schema()
+          .addField(Long.class, "instrid", 0L, true)
+          .addField(Long.class, "rid", null, false)
+          .addField(Integer.class, "step", null, false)
+          .addField(String.class, "description", null, false);
 
   public Instruction(Long instrid, Long rid, Integer step, String description) {
-    this.setStatus(Status.DIRTY);
     initializeFields(instrid, rid, step, description);
+    setDirty();
   }
 
   public Instruction(Long rid, Integer step, String description) {
-    this.setStatus(Status.NEW);
     initializeFields(null, rid, step, description);
   }
 
   public Instruction(Long rid) {
-    this.setStatus(Status.NEW);
     initializeFields(null, rid, null, null);
   }
 
   private void initializeFields(Long instrid, Long rid, Integer step, String description) {
-    addField(new Field<>(Long.class, "instrid", instrid == null ? 0L : instrid, true));
-    addField(new Field<>(Long.class, "rid", rid, false));
-    addField(new Field<>(Integer.class, "step", step, false));
-    addField(new Field<>(String.class, "description", description, false));
+    fields = deepCopyFields(ENTITY_FIELDS);
+    setFieldValue("instrid", instrid == null ? 0L : instrid);
+    setFieldValue("rid", rid);
+    setFieldValue("step", step);
+    setFieldValue("description", description);
+    setNew();
   }
 
   public String getTableName() {

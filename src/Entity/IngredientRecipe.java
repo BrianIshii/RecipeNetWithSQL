@@ -1,29 +1,41 @@
-package Entity;
+package entity;
+
+import schema.Schema;
 
 public class IngredientRecipe extends Entity {
   public static final String TABLE_NAME = "Ingredient_Recipe";
-  private Long rid;
+  public static final Schema ENTITY_FIELDS =
+          new Schema()
+          .addField(Long.class, "rid", 0L, true)
+          .addField(Long.class, "iid", 0L, true)
+          .addField(Integer.class, "amount", null, false)
+          .addField(String.class, "unit", null, false);
+
+
   private Ingredient ingredient;
-  private Integer amount;
-  private String unit;
 
   public IngredientRecipe(Long rid, Ingredient ingredient, Integer amount, String unit) {
-    this.setStatus(Status.DIRTY);
     this.ingredient = ingredient;
     initializeFields(rid, ingredient, amount, unit);
+    setDirty();
   }
 
   public IngredientRecipe(Long rid, Ingredient ingredient) {
-    this.setStatus(Status.NEW);
     this.ingredient = ingredient;
     initializeFields(rid, ingredient, null, null);
   }
 
   private void initializeFields(Long rid, Ingredient ingredient, Integer amount, String unit) {
-    addField(Long.class, "rid", rid, true);
-    addField(Long.class, "iid", ingredient.getValue("iid"), true);
-    addField(Integer.class, "amount", amount, false);
-    addField(String.class, "unit", unit, false);
+    fields = deepCopyFields(ENTITY_FIELDS);
+    setFieldValue("rid", rid);
+    setFieldValue("iid", ingredient.getFieldValue("iid"));
+    setFieldValue("amount", amount);
+    setFieldValue("unit", unit);
+    setNew();
+  }
+
+  public Ingredient getIngredient() {
+    return ingredient;
   }
 
   public Ingredient getIngredient() {

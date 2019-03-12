@@ -10,12 +10,12 @@ public class Recipe extends Entity {
   public static final String TABLE_NAME = "Recipe";
   public static final Schema ENTITY_FIELDS =
           new Schema()
-          .addField(Long.class, "rid", 0L, true)
-          .addField(String.class, "title", null, false)
-          .addField(String.class, "url", null, false)
-          .addField(Long.class, "uid", null, false)
-          .addField(Date.class, "date", null, false)
-          .addField(Integer.class, "rating", null, false);
+                  .addField(Long.class, "rid", 0L, true)
+                  .addField(String.class, "title", null, false)
+                  .addField(String.class, "url", null, false)
+                  .addField(Long.class, "uid", null, false)
+                  .addField(Date.class, "date", null, false)
+                  .addField(Integer.class, "rating", null, false);
 
   private User user;
   private List<IngredientRecipe> ingredients;
@@ -85,7 +85,7 @@ public class Recipe extends Entity {
 
   public void addIngredient(Ingredient ingredient, Integer amount, String unit) {
     IngredientRecipe ingredient_recipe =
-        new IngredientRecipe((Long) this.getFieldValue("rid"), ingredient, amount, unit);
+            new IngredientRecipe((Long) this.getFieldValue("rid"), ingredient, amount, unit);
     this.ingredients.add(ingredient_recipe);
     setDirty();
   }

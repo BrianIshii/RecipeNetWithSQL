@@ -1,11 +1,11 @@
-package Service;
+package service;
 
-import Entity.Field;
-import Entity.Ingredient;
-import Entity.IngredientRecipe;
-import Entity.Status;
+import entity.Ingredient;
+import entity.IngredientRecipe;
+import formatter.Field;
+import schema.RequestSchema;
+import schema.ResponseSchema;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,34 +22,35 @@ public class IngredientRecipeService extends EntityService {
 
   public List<IngredientRecipe> searchByRecipe(Long rid) {
     // A list of fields that can be expected from the view
-    List<Field> fieldsToExpect =
-        Arrays.asList(
-            new Field(Long.class, "rid", null, true),
-            new Field(Long.class, "iid", null, true),
-            new Field(String.class, "name", null, false),
-            new Field(Integer.class, "amount", null, false),
-            new Field(String.class, "unit", null, false));
+    RequestSchema expected =
+        new RequestSchema()
+            .addField(Long.class, "rid", null, true)
+            .addField(Long.class, "iid", null, true)
+            .addField(String.class, "name", null, false)
+            .addField(Integer.class, "amount", null, false)
+            .addField(String.class, "unit", null, false);
 
     // Key to use in the where clause
     Field searchKey = new Field(Long.class, "rid", rid, true);
 
-    List<List<Field>> fieldsExtracted =
-        executorService.executeSelect(
-                RECIPE_INGREDIENTS_VIEW, fieldsToExpect, searchKey);
+    List<ResponseSchema> response =
+        executorService.executeSelect(RECIPE_INGREDIENTS_VIEW, expected, searchKey);
 
     List<IngredientRecipe> ingredients = new LinkedList<>();
-    IngredientRecipe irTemp;
-    Ingredient iTemp;
-    for (List<Field> fieldGroup : fieldsExtracted) {
-      iTemp = new Ingredient(rid);
-      Field.applyTo(fieldGroup, iTemp.getFields(), false);
-      iTemp.setStatus(Status.SYNCED);
+    IngredientRecipe tempIngredientRecipe;
+    Ingredient tempIngredient;
+    for (ResponseSchema res : response) {
+      tempIngredient = new Ingredient(rid);
+      res.applyValuesTo(tempIngredient, false);
+      tempIngredient.setSynced();
 
-      irTemp = new IngredientRecipe(rid, iTemp);
-      Field.applyTo(fieldGroup, irTemp.getFields(), false);
-      irTemp.setStatus(Status.SYNCED);
-      ingredients.add(irTemp);
+      tempIngredientRecipe = new IngredientRecipe(rid, tempIngredient);
+      res.applyValuesTo(tempIngredientRecipe, false);
+      tempIngredientRecipe.setSynced();
+
+      ingredients.add(tempIngredientRecipe);
     }
+
     return ingredients;
   }
 }

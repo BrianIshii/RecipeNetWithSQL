@@ -1,13 +1,15 @@
-package Service;
+package service;
 
-import Entity.Field;
+import formatter.Field;
+import formatter.QueryFormatter;
+import schema.RequestSchema;
+import schema.ResponseSchema;
+import schema.Schema;
 
 import java.lang.reflect.Method;
 import java.sql.Date;
 import java.sql.*;
 import java.util.*;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
 
 public class ExecutorService {
   private static Map<Class, Method> getters;
@@ -30,8 +32,7 @@ public class ExecutorService {
       setters.put(
           Integer.class, PreparedStatement.class.getDeclaredMethod("setInt", int.class, int.class));
       setters.put(
-          java.util.Date.class,
-          PreparedStatement.class.getDeclaredMethod("setDate", int.class, Date.class));
+          Date.class, PreparedStatement.class.getDeclaredMethod("setDate", int.class, Date.class));
 
       // RS getters
       getters.put(Long.class, ResultSet.class.getDeclaredMethod("getLong", String.class));
@@ -124,18 +125,18 @@ public class ExecutorService {
    * @param fieldsToInsert
    * @return
    */
-  public List<Field> executeInsert(
-      String tableName, List<Field> fieldsToPopulate, List<Field> fieldsToInsert) {
+  public ResponseSchema executeInsert(
+      String tableName, Schema fieldsToPopulate, Schema fieldsToInsert) {
     try {
-      String query = QueryFormatter.getInsertQuery(tableName, fieldsToInsert);
+      String query = QueryFormatter.getInsertQuery(tableName, fieldsToInsert.getFields());
       PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-      applyFieldsToStatement(ps, 1, fieldsToInsert);
+      applyFieldsToStatement(ps, 1, fieldsToInsert.getFields());
       System.out.println(ps.toString());
       int affectedRows = ps.executeUpdate();
       if (affectedRows == 0) return null;
-      if (extractAndSetPK(ps, fieldsToPopulate)) {
+      if (extractAndSetPK(ps, fieldsToPopulate.getFields())) {
         ps.close();
-        return fieldsToPopulate;
+        return new ResponseSchema(fieldsToPopulate);
       }
     } catch (SQLException sqle) {
       if (sqle.getMessage().contains("Duplicate")) {
@@ -171,32 +172,57 @@ public class ExecutorService {
   }
 
   /**
-   * Fetches an entity from the database using a search for the given fields.
+   * Alternate version of delete for convenience.
    *
    * @param tableName
-   * @param fieldsToExpect
    * @param fieldsWhere
    * @return
    */
-  public List<List<Field>> executeSelect(
-      String tableName, List<Field> fieldsToExpect, List<Field> fieldsWhere) {
+  public boolean executeDelete(String tableName, Field... fieldsWhere) {
+    return executeDelete(tableName, Arrays.asList(fieldsWhere));
+  }
+
+  /**
+   * Selects tuples based on the edit distance between a one of their fields and a string.
+   *
+   * @param tableName
+   * @param fieldsToExpect
+   * @param fieldNameToCompare
+   * @param toValue
+   * @param maxDistance
+   * @return
+   */
+  public List<ResponseSchema> executeLevenshteinSelect(
+      String tableName,
+      Schema fieldsToExpect,
+      String fieldNameToCompare,
+      String toValue,
+      int maxDistance) {
+    String query =
+        QueryFormatter.getLevensteinSelectQuery(
+            tableName, fieldsToExpect.getFields(), fieldNameToCompare, toValue, maxDistance);
     try {
-      String query = QueryFormatter.getSelectQuery(tableName, fieldsToExpect, fieldsWhere);
       PreparedStatement ps = con.prepareStatement(query);
-      if(fieldsWhere != null)
-        applyFieldsToStatement(ps, 1, fieldsWhere);
+      return executeBaseSelect(ps, fieldsToExpect.getFields());
+    } catch (SQLException sqle) {
+      sqle.printStackTrace();
+      return null;
+    }
+  }
+
+  private List<ResponseSchema> executeBaseSelect(PreparedStatement ps, List<Field> fieldsToExpect) {
+    try {
       System.out.println(ps.toString());
 
       ResultSet rs = ps.executeQuery();
       // Populate a list of lists of fields with all the results
-      List<List<Field>> allResults = new LinkedList<>();
+      List<ResponseSchema> allResults = new LinkedList<>();
       while (rs.next()) {
-        List<Field> currentResult = new ArrayList<Field>();
+        ResponseSchema currentResult = new ResponseSchema();
         Field newField;
         for (Field f : fieldsToExpect) {
           Object extractedValue = applyGet(rs, f.getValueType(), f.getKey());
-          newField = new Field(f.getValueType(), f.getKey(), extractedValue);
-          currentResult.add(newField);
+          currentResult.addField(f.getValueType(), f.getKey(), extractedValue, false);
         }
         allResults.add(currentResult);
       }
@@ -210,22 +236,46 @@ public class ExecutorService {
     }
   }
 
-  public List<List<Field>> executeSelect(
-      String tableName, List<Field> fieldsToExpect, Field... fieldsWhere) {
+  /**
+   * Fetches an entity from the database using a search for the given fields.
+   *
+   * @param tableName
+   * @param fieldsToExpect
+   * @param fieldsWhere
+   * @return
+   */
+  public List<ResponseSchema> executeSelect(
+      String tableName, Schema fieldsToExpect, List<Field> fieldsWhere) {
+    String query =
+        QueryFormatter.getSelectQuery(tableName, fieldsToExpect.getFields(), fieldsWhere);
+    try {
+      PreparedStatement ps = con.prepareStatement(query);
+      if (fieldsWhere != null) applyFieldsToStatement(ps, 1, fieldsWhere);
+      return executeBaseSelect(ps, fieldsToExpect.getFields());
+    } catch (SQLException sqle) {
+      sqle.printStackTrace();
+      return null;
+    }
+  }
+
+  public List<ResponseSchema> executeSelect(
+      String tableName, Schema fieldsToExpect, Field... fieldsWhere) {
     return executeSelect(tableName, fieldsToExpect, Arrays.asList(fieldsWhere));
   }
 
-  public List<List<Field>> executeSelect(
-          String tableName, List<Field> fieldsToExpect) {
-    return executeSelect(tableName, fieldsToExpect, new LinkedList<>());
+  public List<ResponseSchema> executeSelect(String tableName, Schema fieldsToExpect) {
+    return executeSelect(tableName, fieldsToExpect, new ArrayList<>());
   }
 
-  public boolean executeUpdate(String tableName, List<Field> fieldsToSet, List<Field> fieldsWhere) {
+  public boolean executeUpdate(
+      String tableName, Schema fieldsToSet, Schema fieldsWhere) {
     try {
-      String query = QueryFormatter.getUpdateQuery(tableName, fieldsToSet, fieldsWhere);
+      String query =
+          QueryFormatter.getUpdateQuery(
+              tableName, fieldsToSet.getFields(), fieldsWhere.getFields());
       PreparedStatement ps = con.prepareStatement(query);
-      applyFieldsToStatement(ps, 1, fieldsToSet);
-      applyFieldsToStatement(ps, 1 + fieldsToSet.size(), fieldsWhere);
+      applyFieldsToStatement(ps, 1, fieldsToSet.getFields());
+      applyFieldsToStatement(ps, 1 + fieldsToSet.numFields(), fieldsWhere.getFields());
       System.out.println(ps.toString());
 
       int affectedRows = ps.executeUpdate();

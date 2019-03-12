@@ -1,9 +1,10 @@
-package Service;
+package service;
 
-import Entity.Field;
-import Entity.Status;
-import Entity.User;
+import entity.User;
+import schema.ResponseSchema;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class UserService extends EntityService {
@@ -24,19 +25,35 @@ public class UserService extends EntityService {
    */
   public User authenticate(String email, String password) {
     User user = new User(email, password);
-    List<List<Field>> extractedFields =
+    List<ResponseSchema> response =
         executorService.executeSelect(
-            User.TABLE_NAME, user.getFields(), user.getField("email"), user.getField("password"));
-    if (extractedFields.size() == 0) {
+            User.TABLE_NAME, User.ENTITY_FIELDS, user.getField("email"), user.getField("password"));
+    if (response.size() == 0) {
       System.out.println(
           String.format("Credentials username: %s, password: %s were not found", email, password));
       return null;
     }
-    Field.applyTo(extractedFields.get(0), user.getFields(), true);
-
-    user.setStatus(Status.SYNCED);
+    response.get(0).applyValuesTo(user, true);
+    user.setSynced();
     return user;
   }
 
-  // TODO list all users
+  public List<User> fuzzyNameSearch(String name, int maxEditDistance) {
+    List<ResponseSchema> response =
+        executorService.executeLevenshteinSelect(
+            User.TABLE_NAME, User.ENTITY_FIELDS, "name", name, maxEditDistance);
+    if (response == null) {
+      return new LinkedList<>();
+    }
+
+    List<User> users = new ArrayList<>();
+    User user;
+    for (ResponseSchema res : response) {
+      user = new User();
+      res.applyValuesTo(user, true);
+      user.setSynced();
+      users.add(user);
+    }
+    return users;
+  }
 }

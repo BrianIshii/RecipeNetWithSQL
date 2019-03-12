@@ -1,7 +1,5 @@
-
-import Entity.Entity;
-import Entity.User;
-import Service.UserService;
+import entity.Entity;
+import entity.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,9 +7,10 @@ import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import java.util.regex.Pattern;
+import service.UserService;
 
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 public class CreateAccountController {
 

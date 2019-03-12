@@ -1,6 +1,5 @@
-import Entity.Recipe;
-import Entity.User;
-import Service.RecipeService;
+import entity.Recipe;
+import entity.User;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -8,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.text.Text;
+import service.RecipeService;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -37,7 +37,7 @@ public class HomeController extends BaseController {
         forwardButton.setDisable(!canPressForwardButton());
 
         user = Main.getUser();
-        name.setText("Welcome, " + (user.getValue("name")));
+        name.setText("Welcome, " + (user.getFieldValue("name")));
 
         List<Recipe> recipes = recipeService.searchByUser(user);
 
@@ -49,7 +49,7 @@ public class HomeController extends BaseController {
         listView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                //System.out.println(recipeNameToRecipeID.get(observable.getValue()));
+                //System.out.println(recipeNameToRecipeID.get(observable.getFieldValue()));
                 RecipeController.recipeID = recipeNameToRecipeID.get(observable.getValue());
                 changeViewTo(RecipeController.FXML);
             }
