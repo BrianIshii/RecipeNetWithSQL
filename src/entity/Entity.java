@@ -24,6 +24,7 @@ public abstract class Entity extends Schema {
   }
 
   public void setDirty() {
+    if(this.status != Status.NEW)
     this.status = Status.DIRTY;
   }
 
