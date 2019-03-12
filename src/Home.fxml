@@ -21,12 +21,15 @@
                <font>
                   <Font size="18.0" />
                </font></Text>
-            <ListView fx:id="listView" />
+            <ListView fx:id="listView">
+               <VBox.margin>
+                  <Insets bottom="10.0" left="20.0" right="20.0" />
+               </VBox.margin></ListView>
              <ToolBar prefHeight="40.0" prefWidth="200.0">
                  <items>
                      <Button fx:id="backButton" mnemonicParsing="false" onAction="#backButtonPressed" text="&lt;" AnchorPane.leftAnchor="0.0" />
                      <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#forwardButtonPressed" text="&gt;" AnchorPane.rightAnchor="0.0" />
-                     <Separator prefWidth="200.0" />
+                     <Separator prefWidth="200.0" visible="false" />
                      <Button fx:id="Logout" mnemonicParsing="false" onAction="#logoutButtonPressed" text="Logout" />
                  </items>
              </ToolBar>
