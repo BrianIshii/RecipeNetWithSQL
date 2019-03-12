@@ -88,8 +88,14 @@ public class RecipeService extends EntityService {
                 "Recipe with title %s was marked for deletion but was not successfully deleted from the database.",
                 recipe.getFieldValue("title")));
     } else {
+      Status recipeStartStatus = recipe.getStatus();
       Recipe temp = super.save(recipe);
       if (temp == null) return temp;
+
+      if(recipeStartStatus == Status.NEW) { //Need to apply generated rid prior to save
+          temp.getIngredients().stream().forEach(i -> i.setFieldValue("rid", temp.getFieldValue("rid")));
+          temp.getInstructions().stream().forEach(i -> i.setFieldValue("rid", temp.getFieldValue("rid")));
+      }
 
       // Save any updates to children and cleanses lists of deleted values
       recipe.getIngredients().removeIf(ir -> ingredientRecipeService.save(ir) == null);

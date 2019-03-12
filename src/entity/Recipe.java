@@ -91,6 +91,7 @@ public class Recipe extends Entity {
   }
 
   public void addAllIngredients(List<IngredientRecipe> ingredientRecipes) {
+    ingredientRecipes.stream().forEach(i -> i.setFieldValue("rid", this.getFieldValue("rid")));
     this.ingredients.addAll(ingredientRecipes);
     setDirty();
   }
