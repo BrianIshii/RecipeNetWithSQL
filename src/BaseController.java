@@ -1,3 +1,5 @@
+import service.RecipeService;
+import com.sun.org.apache.regexp.internal.RE;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -7,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BaseController {
+    protected RecipeService recipeService = RecipeService.getInstance();
+
     private static List<String> views = new ArrayList<String>();
     private static int currentViewIndex = 0;
     protected String FXML;

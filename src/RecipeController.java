@@ -1,5 +1,6 @@
 import entity.Ingredient;
 import entity.IngredientRecipe;
+import entity.Instruction;
 import entity.Recipe;
 import service.RecipeService;
 import javafx.beans.property.BooleanProperty;
@@ -24,6 +25,7 @@ public class RecipeController extends BaseController {
     @FXML private Button backButton;
     @FXML private Button forwardButton;
     @FXML ListView<String> ingredientsView = new ListView<>();
+    @FXML ListView<String> instructionsView = new ListView<>();
 
     public RecipeController() {
         super(FXML);
@@ -35,10 +37,17 @@ public class RecipeController extends BaseController {
         backButton.setDisable(!canPressBackButton());
         forwardButton.setDisable(!canPressForwardButton());
 
+        System.out.println("Recipe id: " + recipeID);
         Recipe r = recipeService.searchById(recipeID);
         for (IngredientRecipe i : r.getIngredients()) {
             String ingredientInfo = (i.getField("amount").getValue() + " " + i.getField("unit").getValue());
             ingredientsView.getItems().add(ingredientInfo);
+        }
+
+        for (Instruction i : r.getInstructions()) {
+            String instructionInfo = (i.getField("step").getValue() + " " + i.getField("description").getValue());
+            instructionsView.getItems().add(instructionInfo);
+            System.out.println(instructionInfo);
         }
 
         ingredientsView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
@@ -61,6 +70,7 @@ public class RecipeController extends BaseController {
 
         System.out.println(r);
     }
+
     public void homeButtonPressed(ActionEvent event) throws IOException {
         changeViewTo(HomeController.FXML);
     }

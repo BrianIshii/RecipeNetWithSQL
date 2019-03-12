@@ -31,6 +31,7 @@
                      <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#forwardButtonPressed" text="&gt;" AnchorPane.rightAnchor="0.0" />
                      <Separator prefWidth="200.0" visible="false" />
                      <Button fx:id="Logout" mnemonicParsing="false" onAction="#logoutButtonPressed" text="Logout" />
+                     <Button fx:id="addRecipe" mnemonicParsing="false" onAction="#addRecipeButtonPressed" text="Add Recipe" />
                  </items>
              </ToolBar>
 

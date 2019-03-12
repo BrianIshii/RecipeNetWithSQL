@@ -42,8 +42,8 @@ public class HomeController extends BaseController {
         List<Recipe> recipes = recipeService.searchByUser(user);
 
         for(Recipe r : recipes) {
-            recipeNameToRecipeID.put((String)r.getField("title").getValue(), (Long)(r.getField("rid").getValue()));
-            listView.getItems().add((String)r.getField("title").getValue());
+            recipeNameToRecipeID.put((String)r.getField("title").getValue()+(r.getField("rid").getValue()), (Long)(r.getField("rid").getValue()));
+            listView.getItems().add((String)r.getField("title").getValue()+(r.getField("rid").getValue()));
         }
 
         listView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
@@ -60,6 +60,9 @@ public class HomeController extends BaseController {
         logout();
     }
 
+    public void addRecipeButtonPressed(ActionEvent event) throws IOException {
+        changeViewTo(AddRecipeController.FXML);
+    }
 
 
 }
