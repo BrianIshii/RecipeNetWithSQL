@@ -1,7 +1,7 @@
-package foo2;
+package service;
 
-import foo.Ingredient;
-import foo.IngredientRecipe;
+import entity.Ingredient;
+import entity.IngredientRecipe;
 import schema.Field;
 import schema.RequestSchema;
 import schema.ResponseSchema;

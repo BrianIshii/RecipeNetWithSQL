@@ -1,13 +1,13 @@
 package ServiceTests;
 
-import foo.Ingredient;
-import foo.Recipe;
-import foo.Status;
-import foo.User;
+import entity.Ingredient;
+import entity.Recipe;
+import entity.Status;
+import entity.User;
 import org.junit.jupiter.api.*;
-import foo2.IngredientService;
-import foo2.RecipeService;
-import foo2.UserService;
+import service.IngredientService;
+import service.RecipeService;
+import service.UserService;
 import utilities.DateUtils;
 
 import java.sql.SQLException;

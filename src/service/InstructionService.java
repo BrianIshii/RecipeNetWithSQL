@@ -1,6 +1,6 @@
-package foo2;
+package service;
 
-import foo.Instruction;
+import entity.Instruction;
 import schema.Field;
 import schema.ResponseSchema;
 

@@ -1,8 +1,8 @@
 package ServiceTests;
 
-import foo.*;
-import foo2.DatabaseConnection;
-import foo2.UserService;
+import entity.*;
+import service.DatabaseConnection;
+import service.UserService;
 import utilities.DateUtils;
 
 import java.sql.Connection;

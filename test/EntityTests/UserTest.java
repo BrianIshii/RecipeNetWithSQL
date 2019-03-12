@@ -1,8 +1,8 @@
 package EntityTests;
 
 import schema.Field;
-import foo.Status;
-import foo.User;
+import entity.Status;
+import entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -1,4 +1,4 @@
-package foo2;
+package service;
 
 import schema.Field;
 import formatter.QueryFormatter;
