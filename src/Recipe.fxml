@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -11,7 +13,19 @@
    <children>
       <VBox alignment="CENTER" layoutX="250.0" layoutY="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Label text="Recipe" />
+             <Label text="Recipe" />
+             <Label text="Ingredients" />
+            <ListView fx:id="ingredientsView" prefHeight="200.0" prefWidth="200.0">
+               <VBox.margin>
+                  <Insets left="20.0" right="20.0" />
+               </VBox.margin>
+            </ListView>
+             <Label text="Instructions" />
+             <ListView fx:id="instructionsView" prefHeight="200.0" prefWidth="200.0">
+                 <VBox.margin>
+                     <Insets left="20.0" right="20.0" />
+                 </VBox.margin>
+             </ListView>
 
          </children>
       </VBox>

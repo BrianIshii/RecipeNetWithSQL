@@ -26,6 +26,10 @@ public class IngredientRecipe extends Entity {
     addField(String.class, "unit", unit, false);
   }
 
+  public Ingredient getIngredient() {
+    return ingredient;
+  }
+
   public String getTableName() {
     return TABLE_NAME;
   }
