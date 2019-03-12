@@ -1,8 +1,7 @@
-package service;
+package foo2;
 
-import entity.Entity;
-import formatter.Field;
-import entity.Status;
+import foo.Entity;
+import schema.Field;
 import schema.RequestSchema;
 import schema.ResponseSchema;
 
@@ -61,7 +60,7 @@ public abstract class EntityService {
     RequestSchema primaryFields = new RequestSchema(entity.getPrimaryKeys());
     RequestSchema nonPrimaryFields = new RequestSchema(entity.getNonPrimaryKeys());
     ResponseSchema response =
-        executorService.executeInsert(entity.getTableName(), primaryFields, nonPrimaryFields);
+            executorService.executeInsert(entity.getTableName(), primaryFields, nonPrimaryFields);
     if (response == null) return null;
     response.applyValuesTo(entity, true);
     entity.setSynced();
@@ -80,7 +79,7 @@ public abstract class EntityService {
     RequestSchema primaryFields = new RequestSchema(entity.getPrimaryKeys());
     RequestSchema nonPrimaryFields = new RequestSchema(entity.getNonPrimaryKeys());
     boolean status =
-        executorService.executeUpdate(entity.getTableName(), nonPrimaryFields, primaryFields);
+            executorService.executeUpdate(entity.getTableName(), nonPrimaryFields, primaryFields);
     if (status) entity.setSynced();
     else
       throw new RuntimeException(String.format("Failed to update entity: %s", entity.toString()));

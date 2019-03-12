@@ -1,5 +1,7 @@
 package formatter;
 
+import schema.Field;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -7,7 +9,8 @@ public class QueryFormatter {
   private static final String INSERT_TEMPLATE = "INSERT INTO %s (%s) VALUES %s;";
   private static final String SELECT_BASE_TEMPLATE = "SELECT %s FROM %s;";
   private static final String SELECT_WHERE_TEMPLATE = "SELECT %s FROM %s WHERE %s;";
-    private static final String LEVENSTEIN_SELECT_TEMPLATE = "SELECT %s FROM %s WHERE levenshtein(%s, '?') < %s";
+  private static final String LEVENSTEIN_SELECT_TEMPLATE =
+      "SELECT %s FROM %s WHERE levenshtein(%s, '%s') < %s";
   private static final String UPDATE_TEMPLATE = "UPDATE %s SET %s WHERE %s;";
   private static final String DELETE_TEMPLATE = "DELETE FROM %s WHERE %s;";
 
@@ -43,9 +46,20 @@ public class QueryFormatter {
         composeCompareFields(fieldsWhere, JoinType.AND));
   }
 
-    public static String getLevensteinSelectQuery(String tableName, List<Field> fieldsToExpect, String fieldToCompare, String toValue, int maxDistance) {
-        return String.format(LEVENSTEIN_SELECT_TEMPLATE, composeFields(fieldsToExpect), tableName, fieldToCompare, toValue, maxDistance);
-    }
+  public static String getLevensteinSelectQuery(
+      String tableName,
+      List<Field> fieldsToExpect,
+      String fieldToCompare,
+      String toValue,
+      int maxDistance) {
+    return String.format(
+        LEVENSTEIN_SELECT_TEMPLATE,
+        composeFields(fieldsToExpect),
+        tableName,
+        fieldToCompare,
+        toValue,
+        maxDistance);
+  }
 
   private static String createBlankFields(int n) {
     StringBuilder stringBuilder = new StringBuilder("(");
@@ -57,13 +71,13 @@ public class QueryFormatter {
   }
 
   private static String composeFields(List<Field> fields) {
-      List<String> fieldNames = fields.stream().map(f -> f.getKey()).collect(Collectors.toList());
-      return String.join(", ", fieldNames);
+    List<String> fieldNames = fields.stream().map(f -> f.getKey()).collect(Collectors.toList());
+    return String.join(", ", fieldNames);
   }
 
   private static String composeCompareFields(List<Field> fields, JoinType jt) {
-      StringBuilder sb = new StringBuilder();
-      List<String> fieldNames = fields.stream().map(f -> f.getKey()).collect(Collectors.toList());
-      return String.join("=?" + jt.getContent(), fieldNames) + "=?";
+    StringBuilder sb = new StringBuilder();
+    List<String> fieldNames = fields.stream().map(f -> f.getKey()).collect(Collectors.toList());
+    return String.join("=?" + jt.getContent(), fieldNames) + "=?";
   }
 }

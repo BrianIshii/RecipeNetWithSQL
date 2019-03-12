@@ -1,8 +1,8 @@
-import entity.Recipe;
+import foo.Recipe;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import service.RecipeService;
+import foo2.RecipeService;
 
 import java.io.IOException;
 

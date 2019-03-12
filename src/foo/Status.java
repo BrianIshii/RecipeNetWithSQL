@@ -1,4 +1,4 @@
-package entity;
+package foo;
 
 public enum Status {
   NEW,

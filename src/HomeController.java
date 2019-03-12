@@ -1,5 +1,5 @@
-import entity.Recipe;
-import entity.User;
+import foo.Recipe;
+import foo.User;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -7,7 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.text.Text;
-import service.RecipeService;
+import foo2.RecipeService;
 
 import java.io.IOException;
 import java.util.HashMap;

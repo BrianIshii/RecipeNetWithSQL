@@ -1,4 +1,4 @@
-package entity;
+package foo;
 
 import schema.Schema;
 
@@ -32,10 +32,6 @@ public class IngredientRecipe extends Entity {
         setFieldValue("amount", amount);
         setFieldValue("unit", unit);
         setNew();
-    }
-
-    public Ingredient getIngredient() {
-        return ingredient;
     }
 
     public Ingredient getIngredient() {

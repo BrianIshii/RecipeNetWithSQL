@@ -1,7 +1,5 @@
 package schema;
 
-import formatter.Field;
-
 import java.util.ArrayList;
 import java.util.Collection;
 

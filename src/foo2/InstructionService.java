@@ -1,7 +1,7 @@
-package service;
+package foo2;
 
-import entity.Instruction;
-import formatter.Field;
+import foo.Instruction;
+import schema.Field;
 import schema.ResponseSchema;
 
 import java.util.ArrayList;

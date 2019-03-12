@@ -1,8 +1,8 @@
-package service;
+package foo2;
 
-import entity.Ingredient;
-import entity.IngredientRecipe;
-import formatter.Field;
+import foo.Ingredient;
+import foo.IngredientRecipe;
+import schema.Field;
 import schema.RequestSchema;
 import schema.ResponseSchema;
 

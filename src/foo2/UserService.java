@@ -1,6 +1,6 @@
-package service;
+package foo2;
 
-import entity.User;
+import foo.User;
 import schema.ResponseSchema;
 
 import java.util.ArrayList;

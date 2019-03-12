@@ -1,4 +1,4 @@
-package formatter;
+package schema;
 
 import java.util.Objects;
 

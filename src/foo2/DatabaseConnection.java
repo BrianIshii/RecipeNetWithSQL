@@ -1,4 +1,4 @@
-package service;
+package foo2;
 
 import java.io.*;
 import java.sql.Connection;

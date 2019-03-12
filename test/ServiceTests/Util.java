@@ -1,15 +1,13 @@
 package ServiceTests;
 
-import Entity.*;
-import Service.DatabaseConnection;
-import Service.UserService;
-import Utilities.DateUtils;
+import foo.*;
+import foo2.DatabaseConnection;
+import foo2.UserService;
+import utilities.DateUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import static EntityTests.Constants.*;
 
@@ -60,7 +58,6 @@ public class Util {
   }
 
   public static void initUsers() throws SQLException {
-    clearUsers();
     PreparedStatement ps =
         con.prepareStatement(
             String.format(
@@ -82,6 +79,7 @@ public class Util {
   }
 
   public static void initRecipes() throws SQLException {
+    clearDB();
     clearInstructions();
     clearRecipes();
 
@@ -91,7 +89,12 @@ public class Util {
     String query =
         String.format(
             "INSERT INTO %s (title, url, uid, date, rating) VALUES ('%s', '%s', %s, '%s', %s)",
-            Recipe.TABLE_NAME, RECIPE_TITLE, RECIPE_URL, user.getValue("uid"), date, RECIPE_RATING);
+            Recipe.TABLE_NAME,
+            RECIPE_TITLE,
+            RECIPE_URL,
+            user.getFieldValue("uid"),
+            date,
+            RECIPE_RATING);
 
     PreparedStatement ps = con.prepareStatement(query);
     ps.executeUpdate();
@@ -102,8 +105,10 @@ public class Util {
     int step = 1;
     String query;
     for (String desc : INSTRUCTIONS) {
-      query = String.format("INSERT INTO %s (rid, step, description) VALUES (%s, %s, '%s');", Instruction.TABLE_NAME,
-              rid, step, desc);
+      query =
+          String.format(
+              "INSERT INTO %s (rid, step, description) VALUES (%s, %s, '%s');",
+              Instruction.TABLE_NAME, rid, step, desc);
       PreparedStatement ps = con.prepareStatement(query);
       ps.executeUpdate();
       ps.close();
@@ -111,7 +116,5 @@ public class Util {
     }
   }
 
-  public static void initIngredientRecipe(Long rid) throws SQLException {
-
-  }
+  public static void initIngredientRecipe(Long rid) throws SQLException {}
 }

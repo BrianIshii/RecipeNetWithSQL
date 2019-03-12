@@ -1,6 +1,6 @@
-package service;
+package foo2;
 
-import entity.Ingredient;
+import foo.Ingredient;
 import schema.ResponseSchema;
 
 import java.util.ArrayList;

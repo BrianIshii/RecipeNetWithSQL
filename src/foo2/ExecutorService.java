@@ -1,6 +1,6 @@
-package service;
+package foo2;
 
-import formatter.Field;
+import schema.Field;
 import formatter.QueryFormatter;
 import schema.ResponseSchema;
 import schema.Schema;

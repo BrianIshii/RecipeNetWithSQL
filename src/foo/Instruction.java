@@ -1,4 +1,4 @@
-package entity;
+package foo;
 
 import schema.Schema;
 
