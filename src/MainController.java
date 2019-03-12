@@ -37,6 +37,7 @@ public class MainController {
             Main.setUser(authenticatedUser);
             Parent root = FXMLLoader.load(getClass().getResource("Home.fxml"));
             Main.getPrimaryStage().getScene().setRoot(root);
+            root.requestFocus();
         } else {
             // Alarm that the credentials are not valid
             Alert alert = new Alert(Alert.AlertType.ERROR);

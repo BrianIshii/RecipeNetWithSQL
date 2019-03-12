@@ -21,10 +21,11 @@ public class BaseController {
         Parent root = null;
         try {
             root = FXMLLoader.load(getClass().getResource(filename));
+            Main.getPrimaryStage().getScene().setRoot(root);
+            root.requestFocus();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Main.getPrimaryStage().getScene().setRoot(root);
     }
 
     protected void changeViewTo(String filename) {
