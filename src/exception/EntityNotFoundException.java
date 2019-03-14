@@ -3,7 +3,11 @@ package exception;
 import schema.Schema;
 
 public class EntityNotFoundException extends ExecutorException {
+  private static final String MSG = "Entity was expected, but not found";
   public EntityNotFoundException(Schema schema, String statement, Throwable cause) {
-    super("Entity was expected, but not found", schema, statement, cause);
+    super(MSG, schema, statement, cause);
+  }
+  public EntityNotFoundException() {
+    super(MSG);
   }
 }

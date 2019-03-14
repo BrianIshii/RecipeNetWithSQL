@@ -1,6 +1,7 @@
 package service;
 
 import entity.Instruction;
+import exception.ExecutorException;
 import schema.Field;
 import schema.ResponseSchema;
 
@@ -16,25 +17,29 @@ public class InstructionService extends EntityService {
 
   private InstructionService() {}
 
-  public List<Instruction> searchByRecipe(Long rid) {
-      List<ResponseSchema> response =
+  public List<Instruction> searchByRecipe(Long rid) throws ExecutorException {
+    List<ResponseSchema> response =
         executorService.executeSelect(
-                Instruction.TABLE_NAME, Instruction.ENTITY_FIELDS, new Field<Long>(Long.class, Instruction.RID, rid, true));
+            Instruction.TABLE_NAME,
+            Instruction.ENTITY_FIELDS,
+            new Field<Long>(Long.class, Instruction.RID, rid, true));
 
     List<Instruction> instructions = new ArrayList<>();
-      Instruction temp;
-      for (ResponseSchema res : response) {
+    Instruction temp;
+    for (ResponseSchema res : response) {
       temp = new Instruction(rid);
-          res.applyValuesTo(temp, true);
-          temp.setSynced();
+      res.applyValuesTo(temp, true);
+      temp.setSynced();
       instructions.add(temp);
     }
-      instructions.sort((i1, i2) -> (Integer) i1.getFieldValue("step") - (Integer) i2.getFieldValue("step"));
+    // TODO add sort query functionality
+    instructions.sort(
+        (i1, i2) -> (Integer) i1.getFieldValue("step") - (Integer) i2.getFieldValue("step"));
     return instructions;
   }
 
-    public void clearRecipeInstructions(Long rid) {
-        executorService.executeDelete(Instruction.TABLE_NAME, new Field<>(Long.class, Instruction.RID, rid));
-    }
-
+  public void clearRecipeInstructions(Long rid) throws ExecutorException {
+    executorService.executeDelete(
+        Instruction.TABLE_NAME, new Field<>(Long.class, Instruction.RID, rid));
+  }
 }

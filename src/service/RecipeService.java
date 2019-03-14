@@ -1,6 +1,7 @@
 package service;
 
 import entity.*;
+import exception.EntityNotFoundException;
 import exception.ExecutorException;
 import schema.ResponseSchema;
 
@@ -26,7 +27,7 @@ public class RecipeService extends EntityService {
    * @param user
    * @return
    */
-  public List<Recipe> searchByUser(User user) {
+  public List<Recipe> searchByUser(User user) throws ExecutorException {
     List<ResponseSchema> response =
         executorService.executeSelect(
             Recipe.TABLE_NAME, Recipe.ENTITY_FIELDS, user.getField(User.UID));
@@ -47,12 +48,13 @@ public class RecipeService extends EntityService {
    * @param rid
    * @return
    */
-  public Recipe searchById(Long rid) {
+  public Recipe searchById(Long rid) throws ExecutorException {
     Recipe foundRecipe = new Recipe(rid);
-    ResponseSchema response =
-        executorService
-            .executeSelect(Recipe.TABLE_NAME, Recipe.ENTITY_FIELDS, foundRecipe.getPrimaryFields())
-            .get(0);
+    List<ResponseSchema> responses =
+        executorService.executeSelect(
+            Recipe.TABLE_NAME, Recipe.ENTITY_FIELDS, foundRecipe.getPrimaryFields());
+    if (responses.size() == 0) throw new EntityNotFoundException();
+    ResponseSchema response = responses.get(0);
     response.applyValuesTo(foundRecipe, true);
 
     // Get the ingredients
@@ -67,54 +69,46 @@ public class RecipeService extends EntityService {
     return foundRecipe;
   }
 
-  /**
-   * Saves both a recipe and any updates made to the children. Deletes instructions prior to saving
-   * new ones to simplify things.
-   *
-   * @param recipe
-   * @return
-   */
-  public Recipe save(Recipe recipe) throws ExecutorException {
-    if (recipe.getStatus() == Status.DELETED_LOCALLY) { // If the recipe is deleted...
-      recipe
-          .getIngredients()
-          .forEach(ir -> ingredientRecipeService.delete(ir)); // Delete connections to ingredients
-      recipe
-          .getInstructions()
-          .forEach(i -> instructionService.delete(i)); // Delete its instructions
-      if (super.delete(recipe)) return null;
-      else
-        throw new RuntimeException(
-            String.format(
-                "Recipe with title %s was marked for deletion but was not successfully deleted from the database.",
-                recipe.getFieldValue("title")));
-    } else {
-      Status recipeStartStatus = recipe.getStatus();
-      Recipe temp = super.save(recipe);
-      if (temp == null) return temp;
-
-      if (recipeStartStatus == Status.NEW) { // Need to apply generated rid prior to save
-        temp.getIngredients().stream()
-            .forEach(i -> i.setFieldValue(Recipe.RID, temp.getFieldValue(Recipe.RID)));
-        temp.getInstructions().stream()
-            .forEach(i -> i.setFieldValue(Recipe.RID, temp.getFieldValue(Recipe.RID)));
-      }
-
-      // Save any updates to children and cleanses lists of deleted values
-      for (Iterator<IngredientRecipe> iterator = recipe.getIngredients().iterator();
-          iterator.hasNext(); ) {
-        if (ingredientRecipeService.save(iterator.next()) == null) iterator.remove();
-      }
-      instructionService.clearRecipeInstructions((Long) recipe.getFieldValue(Recipe.RID));
-      int step = 1;
-      for (Iterator<Instruction> iterator = recipe.getInstructions().iterator();
-          iterator.hasNext(); ) {
-        Instruction i = iterator.next();
-        i.setFieldValue("step", step);
-        instructionService.save(i);
-      }
-      return temp;
+  public void delete(Recipe recipe) throws ExecutorException {
+    for (IngredientRecipe ir : recipe.getIngredients()) {
+      ingredientRecipeService.delete(ir); // Delete connections to ingredients
     }
+    for (Instruction i : recipe.getInstructions()) {
+      instructionService.delete(i); // Delete its instructions
+    }
+    super.delete(recipe);
+  }
+
+  public Recipe save(Recipe recipe) throws ExecutorException {
+    Status recipeStartStatus = recipe.getStatus();
+    if (recipeStartStatus
+        == Status.DELETED_LOCALLY) { // Intercept attempts to save locally deleted recipes
+      delete(recipe);
+      return null;
+    }
+    Recipe temp = super.save(recipe);
+
+    if (recipeStartStatus == Status.NEW) { // Need to apply generated rid prior to save
+      temp.getIngredients().stream()
+          .forEach(i -> i.setFieldValue(Recipe.RID, temp.getFieldValue(Recipe.RID)));
+      temp.getInstructions().stream()
+          .forEach(i -> i.setFieldValue(Recipe.RID, temp.getFieldValue(Recipe.RID)));
+    }
+
+    // Save any updates to children and cleanses lists of deleted values
+    for (Iterator<IngredientRecipe> iterator = recipe.getIngredients().iterator();
+        iterator.hasNext(); ) {
+      if (ingredientRecipeService.save(iterator.next()) == null) iterator.remove();
+    }
+    instructionService.clearRecipeInstructions((Long) recipe.getFieldValue(Recipe.RID));
+    int step = 1;
+    for (Iterator<Instruction> iterator = recipe.getInstructions().iterator();
+        iterator.hasNext(); ) {
+      Instruction i = iterator.next();
+      i.setFieldValue("step", step);
+      instructionService.save(i);
+    }
+    return temp;
   }
 
   /**
@@ -122,14 +116,14 @@ public class RecipeService extends EntityService {
    *
    * @return
    */
-  public List<Recipe> searchAll() {
+  public List<Recipe> searchAll() throws ExecutorException {
     List<ResponseSchema> response =
         executorService.executeSelect(Recipe.TABLE_NAME, Recipe.ENTITY_FIELDS);
 
     List<Recipe> recipes = new ArrayList<>();
     Recipe temp;
     for (ResponseSchema res : response) {
-      temp = new Recipe(0L); // Another dummy initializer
+      temp = new Recipe(0L); // Dummy initializer, rid will be overridden
       res.applyValuesTo(temp, true);
       temp.setSynced();
       recipes.add(temp);

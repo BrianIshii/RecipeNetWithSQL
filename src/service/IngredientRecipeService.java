@@ -4,6 +4,7 @@ import entity.Ingredient;
 import entity.IngredientRecipe;
 import entity.Instruction;
 import entity.Recipe;
+import exception.ExecutorException;
 import schema.Field;
 import schema.RequestSchema;
 import schema.ResponseSchema;
@@ -23,7 +24,7 @@ public class IngredientRecipeService extends EntityService {
         return instance;
     }
 
-    public List<IngredientRecipe> searchByRecipe(Long rid) {
+    public List<IngredientRecipe> searchByRecipe(Long rid) throws ExecutorException {
     // A list of fields that can be expected from the view
     RequestSchema expected =
         new RequestSchema()

@@ -3,6 +3,7 @@ package service;
 import exception.DuplicateEntryException;
 import exception.ExecutorException;
 import exception.NoRowsAffectedException;
+import exception.PreparedStatementCloseFailureException;
 import formatter.QueryFormatter;
 import schema.Field;
 import schema.ResponseSchema;
@@ -84,42 +85,40 @@ public class ExecutorService {
    * @param fields
    */
   private static void applyFieldsToStatement(
-      PreparedStatement ps, int startIndex, List<Field> fields) {
-    try {
-      int i = startIndex;
-      for (Field f : fields) {
-        applySet(ps, f.getValueType(), f.getValue(), i);
-        i++;
-      }
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+      PreparedStatement ps, int startIndex, List<Field> fields) throws ExecutorException {
+    int i = startIndex;
+    for (Field f : fields) {
+      applySet(ps, f.getValueType(), f.getValue(), i);
+      i++;
     }
   }
 
-  private static <T> T applyGet(ResultSet rs, Class<T> valueType, String columnName) {
+  private static <T> T applyGet(ResultSet rs, Class<T> valueType, String columnName)
+      throws ExecutorException {
     try {
       Method method = getters.get(valueType);
       if (method == null)
         throw new RuntimeException(String.format("Class %s is not supported", valueType));
       return (T) method.invoke(rs, columnName);
     } catch (Exception e) {
-      throw new RuntimeException(e);
+      throw new ExecutorException("Issue occurred while extracting fields from ResultSet.", e);
     }
   }
 
-  private static <T> void applySet(PreparedStatement ps, Class<T> valueClass, T value, int index) {
+  private static <T> void applySet(PreparedStatement ps, Class<T> valueClass, T value, int index)
+      throws ExecutorException {
     try {
       Method method = setters.get(valueClass);
       if (method == null)
         throw new RuntimeException(String.format("Class %s is not supported", valueClass));
       method.invoke(ps, index, value);
     } catch (Exception e) {
-      throw new RuntimeException(e);
+      throw new ExecutorException("Issue occurred while setting values of a PreparedStatement", e);
     }
   }
 
   /**
-   * Inserts fields into the databause under the table and populates fieldsToPopulate with the new
+   * Inserts fields into the database under the table and populates fieldsToPopulate with the new
    * generated keys.
    *
    * @param tableName
@@ -145,14 +144,7 @@ public class ExecutorService {
         throw new ExecutorException(fieldsToInsert, query, sqle);
       }
     } finally {
-      if (ps != null) {
-        try {
-          ps.close();
-        } catch (SQLException sqle) {
-          throw new ExecutorException(
-              "Issue occurred while attempting to close prepared statement", sqle);
-        }
-      }
+      safeCloseConnection(ps);
       return new ResponseSchema(fieldsToPopulate);
     }
   }
@@ -164,18 +156,20 @@ public class ExecutorService {
    * @param fieldsWhere
    * @return
    */
-  public boolean executeDelete(String tableName, List<Field> fieldsWhere) {
+  public void executeDelete(String tableName, List<Field> fieldsWhere) throws ExecutorException {
+    String query = QueryFormatter.getDeleteQuery(tableName, fieldsWhere);
+    PreparedStatement ps = null;
     try {
-      String query = QueryFormatter.getDeleteQuery(tableName, fieldsWhere);
-      PreparedStatement ps = con.prepareStatement(query);
+      ps = con.prepareStatement(query);
       applyFieldsToStatement(ps, 1, fieldsWhere);
       System.out.println(ps.toString());
       int affectedRows = ps.executeUpdate();
-      ps.close();
-      return affectedRows > 0;
+      if (affectedRows == 0) throw new NoRowsAffectedException(query);
     } catch (SQLException sqle) {
-      sqle.printStackTrace();
-      return false;
+      throw new ExecutorException(
+          "Issue occurred while attempting to execute DELETE.", query, sqle);
+    } finally {
+      safeCloseConnection(ps);
     }
   }
 
@@ -186,8 +180,8 @@ public class ExecutorService {
    * @param fieldsWhere
    * @return
    */
-  public boolean executeDelete(String tableName, Field... fieldsWhere) {
-    return executeDelete(tableName, Arrays.asList(fieldsWhere));
+  public void executeDelete(String tableName, Field... fieldsWhere) throws ExecutorException {
+    executeDelete(tableName, Arrays.asList(fieldsWhere));
   }
 
   /**
@@ -205,26 +199,27 @@ public class ExecutorService {
       Schema fieldsToExpect,
       String fieldNameToCompare,
       String toValue,
-      int maxDistance) {
+      int maxDistance)
+      throws ExecutorException {
     String query =
         QueryFormatter.getLevensteinSelectQuery(
             tableName, fieldsToExpect.getFields(), fieldNameToCompare, toValue, maxDistance);
+    PreparedStatement ps = null;
     try {
-      PreparedStatement ps = con.prepareStatement(query);
+      ps = con.prepareStatement(query);
       return executeBaseSelect(ps, fieldsToExpect.getFields());
     } catch (SQLException sqle) {
-      sqle.printStackTrace();
-      return null;
+      throw new ExecutorException("Issue occurred while preparing statement", sqle);
     }
   }
 
-  private List<ResponseSchema> executeBaseSelect(PreparedStatement ps, List<Field> fieldsToExpect) {
+  private List<ResponseSchema> executeBaseSelect(PreparedStatement ps, List<Field> fieldsToExpect)
+      throws ExecutorException {
+    List<ResponseSchema> allResults = new LinkedList<>();
     try {
       System.out.println(ps.toString());
-
       ResultSet rs = ps.executeQuery();
       // Populate a list of lists of fields with all the results
-      List<ResponseSchema> allResults = new LinkedList<>();
       while (rs.next()) {
         ResponseSchema currentResult = new ResponseSchema();
         Field newField;
@@ -234,13 +229,13 @@ public class ExecutorService {
         }
         allResults.add(currentResult);
       }
-      ps.close();
-      return allResults;
     } catch (SQLException sqle) {
-      sqle.printStackTrace();
-      return null;
+      throw new ExecutorException("Issue occurred while executing select. ", ps.toString(), sqle);
     } catch (Exception e) {
-      throw new RuntimeException(e);
+      throw new ExecutorException("Issue occurred while preparing statement", e);
+    } finally {
+      safeCloseConnection(ps);
+      return allResults;
     }
   }
 
@@ -253,46 +248,60 @@ public class ExecutorService {
    * @return
    */
   public List<ResponseSchema> executeSelect(
-      String tableName, Schema fieldsToExpect, List<Field> fieldsWhere) {
+      String tableName, Schema fieldsToExpect, List<Field> fieldsWhere) throws ExecutorException {
     String query =
         QueryFormatter.getSelectQuery(tableName, fieldsToExpect.getFields(), fieldsWhere);
+    PreparedStatement ps = null;
     try {
-      PreparedStatement ps = con.prepareStatement(query);
+      ps = con.prepareStatement(query);
       if (fieldsWhere != null) applyFieldsToStatement(ps, 1, fieldsWhere);
       return executeBaseSelect(ps, fieldsToExpect.getFields());
     } catch (SQLException sqle) {
-      sqle.printStackTrace();
-      return null;
+      throw new ExecutorException(
+          "Issue occurred while attempting to prepare statement", query, sqle);
     }
   }
 
   public List<ResponseSchema> executeSelect(
-      String tableName, Schema fieldsToExpect, Field... fieldsWhere) {
+      String tableName, Schema fieldsToExpect, Field... fieldsWhere) throws ExecutorException {
     return executeSelect(tableName, fieldsToExpect, Arrays.asList(fieldsWhere));
   }
 
-  public List<ResponseSchema> executeSelect(String tableName, Schema fieldsToExpect) {
+  public List<ResponseSchema> executeSelect(String tableName, Schema fieldsToExpect)
+      throws ExecutorException {
     return executeSelect(tableName, fieldsToExpect, new ArrayList<>());
   }
 
-  public boolean executeUpdate(String tableName, Schema fieldsToSet, Schema fieldsWhere) {
+  public void executeUpdate(String tableName, Schema fieldsToSet, Schema fieldsWhere)
+      throws ExecutorException {
+    String query =
+        QueryFormatter.getUpdateQuery(tableName, fieldsToSet.getFields(), fieldsWhere.getFields());
+    PreparedStatement ps = null;
     try {
-      String query =
-          QueryFormatter.getUpdateQuery(
-              tableName, fieldsToSet.getFields(), fieldsWhere.getFields());
-      PreparedStatement ps = con.prepareStatement(query);
+      ps = con.prepareStatement(query);
       applyFieldsToStatement(ps, 1, fieldsToSet.getFields());
       applyFieldsToStatement(ps, 1 + fieldsToSet.numFields(), fieldsWhere.getFields());
       System.out.println(ps.toString());
 
       int affectedRows = ps.executeUpdate();
-      ps.close();
-      return affectedRows > 0;
+      if (affectedRows == 0) throw new NoRowsAffectedException(query);
     } catch (SQLException sqle) {
-      sqle.printStackTrace();
-      return false;
+      throw new ExecutorException(
+          "Issue occurred while attempting to execute update.", query, sqle);
     } catch (Exception e) {
-      throw new RuntimeException(e);
+      throw new ExecutorException("Issue occurred while preparing statement.", query, e);
+    } finally {
+      safeCloseConnection(ps);
+    }
+  }
+
+  private void safeCloseConnection(PreparedStatement preparedStatement) throws ExecutorException {
+    if (preparedStatement != null) {
+      try {
+        preparedStatement.close();
+      } catch (SQLException sqle) {
+        throw new PreparedStatementCloseFailureException(sqle);
+      }
     }
   }
 }

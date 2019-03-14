@@ -20,7 +20,7 @@ public abstract class EntityService {
    * @param <E>
    * @return
    */
-  public <E extends Entity> E save(E entity) throws ExecutorException{
+  public <E extends Entity> E save(E entity) throws ExecutorException {
     switch (entity.getStatus()) {
       case NEW:
         return create(entity);
@@ -43,9 +43,9 @@ public abstract class EntityService {
    * @param <E>
    * @return
    */
-  protected <E extends Entity> boolean delete(E entity) {
+  public <E extends Entity> void delete(E entity) throws ExecutorException{
     List<Field> primaryFields = entity.getPrimaryFields();
-    return executorService.executeDelete(entity.getTableName(), primaryFields);
+    executorService.executeDelete(entity.getTableName(), primaryFields);
   }
 
   /**
@@ -62,7 +62,6 @@ public abstract class EntityService {
     RequestSchema nonPrimaryFields = new RequestSchema(entity.getNonPrimaryFields());
     ResponseSchema response =
             executorService.executeInsert(entity.getTableName(), primaryFields, nonPrimaryFields);
-    if (response == null) return null;
     response.applyValuesTo(entity, true);
     entity.setSynced();
     return entity;
@@ -76,14 +75,12 @@ public abstract class EntityService {
    * @param <E>
    * @return
    */
-  protected <E extends Entity> E commit(E entity) {
+  protected <E extends Entity> E commit(E entity) throws ExecutorException {
     RequestSchema primaryFields = new RequestSchema(entity.getPrimaryFields());
     RequestSchema nonPrimaryFields = new RequestSchema(entity.getNonPrimaryFields());
-    boolean status =
-            executorService.executeUpdate(entity.getTableName(), nonPrimaryFields, primaryFields);
-    if (status) entity.setSynced();
-    else
-      throw new RuntimeException(String.format("Failed to update entity: %s", entity.toString()));
+
+    executorService.executeUpdate(entity.getTableName(), nonPrimaryFields, primaryFields);
+    entity.setSynced();
     return entity;
   }
 }
