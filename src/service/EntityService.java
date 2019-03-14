@@ -1,6 +1,7 @@
 package service;
 
 import entity.Entity;
+import exception.ExecutorException;
 import schema.Field;
 import schema.RequestSchema;
 import schema.ResponseSchema;
@@ -19,7 +20,7 @@ public abstract class EntityService {
    * @param <E>
    * @return
    */
-  public <E extends Entity> E save(E entity) {
+  public <E extends Entity> E save(E entity) throws ExecutorException{
     switch (entity.getStatus()) {
       case NEW:
         return create(entity);
@@ -56,7 +57,7 @@ public abstract class EntityService {
    * @param <E>
    * @return
    */
-  protected <E extends Entity> E create(E entity) {
+  protected <E extends Entity> E create(E entity) throws ExecutorException {
     RequestSchema primaryFields = new RequestSchema(entity.getPrimaryFields());
     RequestSchema nonPrimaryFields = new RequestSchema(entity.getNonPrimaryFields());
     ResponseSchema response =

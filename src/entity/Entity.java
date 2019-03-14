@@ -24,8 +24,7 @@ public abstract class Entity extends Schema {
   }
 
   public void setDirty() {
-    if(this.status != Status.NEW)
-    this.status = Status.DIRTY;
+    if (this.status != Status.NEW) this.status = Status.DIRTY;
   }
 
   public void setFieldValue(String key, Object value) {
@@ -42,6 +41,8 @@ public abstract class Entity extends Schema {
   }
 
   public String toString() {
-    return fields.toString();
+    StringBuilder sb =
+        new StringBuilder("Table: ").append(getTableName()).append("\n").append(fields.toString());
+    return sb.toString();
   }
 }

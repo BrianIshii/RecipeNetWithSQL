@@ -1,6 +1,7 @@
 package service;
 
 import entity.*;
+import exception.ExecutorException;
 import schema.ResponseSchema;
 
 import java.util.ArrayList;
@@ -73,7 +74,7 @@ public class RecipeService extends EntityService {
    * @param recipe
    * @return
    */
-  public Recipe save(Recipe recipe) {
+  public Recipe save(Recipe recipe) throws ExecutorException {
     if (recipe.getStatus() == Status.DELETED_LOCALLY) { // If the recipe is deleted...
       recipe
           .getIngredients()
@@ -100,7 +101,10 @@ public class RecipeService extends EntityService {
       }
 
       // Save any updates to children and cleanses lists of deleted values
-      recipe.getIngredients().removeIf(ir -> ingredientRecipeService.save(ir) == null);
+      for (Iterator<IngredientRecipe> iterator = recipe.getIngredients().iterator();
+          iterator.hasNext(); ) {
+        if (ingredientRecipeService.save(iterator.next()) == null) iterator.remove();
+      }
       instructionService.clearRecipeInstructions((Long) recipe.getFieldValue(Recipe.RID));
       int step = 1;
       for (Iterator<Instruction> iterator = recipe.getInstructions().iterator();
