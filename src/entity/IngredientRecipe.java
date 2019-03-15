@@ -41,6 +41,11 @@ public class IngredientRecipe extends Entity {
     return ingredient;
   }
 
+  public void setIngredient(Ingredient ingredient) {
+    this.setFieldValue("iid", ingredient.getFieldValue("iid"));
+    this.ingredient = ingredient;
+  }
+
   public String getTableName() {
     return TABLE_NAME;
   }
