@@ -2,12 +2,14 @@ package exception;
 
 import schema.Schema;
 
+import java.sql.PreparedStatement;
+
 public class NoRowsAffectedException extends ExecutorException {
     private static final String MSG = "No rows were affected during an update.";
-    public NoRowsAffectedException(Schema schema, String query) {
-        super(MSG, schema, query);
+    public NoRowsAffectedException(Schema schema, PreparedStatement preparedStatement) {
+        super(MSG, schema, preparedStatement);
     }
-    public NoRowsAffectedException(String query) {
-        super(new StringBuilder(MSG).append("\nQuery: ").append(query).append("\n").toString());
+    public NoRowsAffectedException(PreparedStatement preparedStatement) {
+        super(new StringBuilder(MSG).append("\nQuery: ").append(preparedStatement.toString()).append("\n").toString());
     }
 }

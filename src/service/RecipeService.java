@@ -126,9 +126,12 @@ public class RecipeService extends EntityService {
         }
         iterator.remove();
       } else ingredientRecipeService.save(ir);
-      if (ingredientRecipeService.save(iterator.next()) == null) iterator.remove();
     }
-    instructionService.deleteRecipeInstructions((Long) recipe.getFieldValue(Recipe.RID));
+    try {
+      instructionService.deleteRecipeInstructions((Long) recipe.getFieldValue(Recipe.RID));
+    } catch (EntityNotFoundException | NoRowsAffectedException ex) {
+      //Recipe may not have had instructions to begin with
+    }
     int step = 1;
     for (Iterator<Instruction> iterator = recipe.getInstructions().iterator();
         iterator.hasNext(); ) {

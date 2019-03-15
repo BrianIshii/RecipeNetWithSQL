@@ -135,17 +135,18 @@ public class ExecutorService {
       applyFieldsToStatement(ps, 1, fieldsToInsert.getFields());
       System.out.println(ps.toString());
       int affectedRows = ps.executeUpdate();
-      if (affectedRows == 0) throw new NoRowsAffectedException(fieldsToInsert, query);
+      if (affectedRows == 0) throw new NoRowsAffectedException(fieldsToInsert, ps);
       extractAndSetPK(ps, fieldsToPopulate.getFields());
+
+      return new ResponseSchema(fieldsToPopulate);
     } catch (SQLException sqle) {
       if (sqle.getMessage().contains("Duplicate")) {
-        throw new DuplicateEntryException(fieldsToInsert, query, sqle);
+        throw new DuplicateEntryException(fieldsToInsert, ps, sqle);
       } else {
-        throw new ExecutorException(fieldsToInsert, query, sqle);
+        throw new ExecutorException(fieldsToInsert, ps, sqle);
       }
     } finally {
       safeCloseConnection(ps);
-      return new ResponseSchema(fieldsToPopulate);
     }
   }
 
@@ -164,10 +165,10 @@ public class ExecutorService {
       applyFieldsToStatement(ps, 1, fieldsWhere);
       System.out.println(ps.toString());
       int affectedRows = ps.executeUpdate();
-      if (affectedRows == 0) throw new NoRowsAffectedException(query);
+      if (affectedRows == 0) throw new NoRowsAffectedException(ps);
     } catch (SQLException sqle) {
       throw new ExecutorException(
-          "Issue occurred while attempting to execute DELETE.", query, sqle);
+          "Issue occurred while attempting to execute DELETE.", ps, sqle);
     } finally {
       safeCloseConnection(ps);
     }
@@ -230,13 +231,13 @@ public class ExecutorService {
         allResults.add(currentResult);
       }
     } catch (SQLException sqle) {
-      throw new ExecutorException("Issue occurred while executing select. ", ps.toString(), sqle);
+      throw new ExecutorException("Issue occurred while executing select. ", ps, sqle);
     } catch (Exception e) {
       throw new ExecutorException("Issue occurred while preparing statement", e);
     } finally {
       safeCloseConnection(ps);
-      return allResults;
     }
+    return allResults; //Must be out here, otherwise Exceptions are suppressed
   }
 
   /**
@@ -258,7 +259,7 @@ public class ExecutorService {
       return executeBaseSelect(ps, fieldsToExpect.getFields());
     } catch (SQLException sqle) {
       throw new ExecutorException(
-          "Issue occurred while attempting to prepare statement", query, sqle);
+          "Issue occurred while attempting to prepare statement", ps, sqle);
     }
   }
 
@@ -284,12 +285,12 @@ public class ExecutorService {
       System.out.println(ps.toString());
 
       int affectedRows = ps.executeUpdate();
-      if (affectedRows == 0) throw new NoRowsAffectedException(query);
+      if (affectedRows == 0) throw new NoRowsAffectedException(ps);
     } catch (SQLException sqle) {
       throw new ExecutorException(
-          "Issue occurred while attempting to execute update.", query, sqle);
+          "Issue occurred while attempting to execute update.", ps, sqle);
     } catch (Exception e) {
-      throw new ExecutorException("Issue occurred while preparing statement.", query, e);
+      throw new ExecutorException("Issue occurred while preparing statement.", ps, e);
     } finally {
       safeCloseConnection(ps);
     }
