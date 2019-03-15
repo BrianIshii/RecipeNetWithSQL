@@ -45,7 +45,7 @@ public class RecipeController extends BaseController {
         }
 
         for (Instruction i : r.getInstructions()) {
-            String instructionInfo = (i.getField("step").getValue() + " " + i.getField("description").getValue());
+            String instructionInfo = (i.getField("step").getValue() + ". " + i.getField("description").getValue());
             instructionsView.getItems().add(instructionInfo);
             System.out.println(instructionInfo);
         }

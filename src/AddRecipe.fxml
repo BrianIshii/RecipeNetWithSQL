@@ -6,14 +6,16 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AddRecipeController">
     <children>
-        <ScrollPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <ScrollPane fitToWidth="true" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <content>
                 <VBox alignment="CENTER" layoutX="250.0" layoutY="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <children>
@@ -24,25 +26,83 @@
                             <VBox.margin>
                                 <Insets bottom="15.0" top="15.0" />
                             </VBox.margin></Label>
-                        <Label text="Ingredients">
-                            <font>
-                                <Font size="15.0" />
-                            </font>
+                        <HBox alignment="CENTER">
+                            <children>
+                                <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Recipe Name">
+                                    <HBox.margin>
+                                        <Insets right="20.0" />
+                                    </HBox.margin>
+                                    <font>
+                                        <Font size="15.0" />
+                                    </font>
+                                </Label>
+                                <TextField fx:id="recipeNameTextField" maxHeight="250.0" prefWidth="250.0" />
+                                <Button disable="true" mnemonicParsing="false" text="+" visible="false">
+                                    <HBox.margin>
+                                        <Insets left="10.0" />
+                                    </HBox.margin>
+                                </Button>
+                            </children>
                             <VBox.margin>
                                 <Insets bottom="5.0" />
-                            </VBox.margin></Label>
+                            </VBox.margin>
+                            <padding>
+                                <Insets bottom="5.0" />
+                            </padding>
+                        </HBox>
+                  <HBox alignment="CENTER">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Add Ingredient">
+                           <HBox.margin>
+                              <Insets right="20.0" />
+                           </HBox.margin>
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </Label>
+                        <TextField fx:id="ingredientTextField" maxHeight="250.0" prefWidth="250.0" />
+                        <Button mnemonicParsing="false" onAction="#addIngredientToList" text="+">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                     <VBox.margin>
+                        <Insets bottom="5.0" />
+                     </VBox.margin>
+                     <padding>
+                        <Insets bottom="5.0" />
+                     </padding>
+                  </HBox>
                         <ListView fx:id="ingredientsView" prefHeight="200.0" prefWidth="200.0">
                             <VBox.margin>
                                 <Insets bottom="10.0" left="20.0" right="20.0" />
                             </VBox.margin>
                         </ListView>
-                        <Label text="Instructions">
+                        <HBox alignment="CENTER">
+                            <children>
+                                <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Add Instruction">
+                                    <HBox.margin>
+                                        <Insets right="20.0" />
+                                    </HBox.margin>
+                                    <font>
+                                        <Font size="15.0" />
+                                    </font>
+                                </Label>
+                                <TextField fx:id="instructionTextField" maxHeight="250.0" prefWidth="250.0" />
+                                <Button mnemonicParsing="false" onAction="#addInstructionToList" text="+">
+                                    <HBox.margin>
+                                        <Insets left="10.0" />
+                                    </HBox.margin>
+                                </Button>
+                            </children>
                             <VBox.margin>
                                 <Insets bottom="5.0" />
                             </VBox.margin>
-                            <font>
-                                <Font size="15.0" />
-                            </font></Label>
+                            <padding>
+                                <Insets bottom="5.0" />
+                            </padding>
+                        </HBox>
                         <ListView fx:id="instructionsView" prefHeight="200.0" prefWidth="200.0">
                             <VBox.margin>
                                 <Insets bottom="10.0" left="20.0" right="20.0" />
