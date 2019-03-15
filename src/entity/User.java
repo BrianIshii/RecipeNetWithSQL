@@ -9,11 +9,11 @@ public class User extends Entity {
   public static final String EMAIL = "email";
   public static final String PASSWORD = "password";
   public static final Schema ENTITY_FIELDS =
-          new Schema()
+      new Schema()
           .addField(Long.class, UID, 0L, true)
-          .addField(String.class, NAME, null, false)
-          .addField(String.class, EMAIL, null, false)
-          .addField(String.class, PASSWORD, null, false);
+          .addField(String.class, NAME, false)
+          .addField(String.class, EMAIL, false)
+          .addField(String.class, PASSWORD, false);
 
   public User() {
     initializeFields(null, null, null, null);

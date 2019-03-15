@@ -17,6 +17,14 @@ public class IngredientService extends EntityService {
     return instance;
   }
 
+  /**
+   * Searches the db for an ingredient with the exact given name.
+   *
+   * @param name
+   * @return
+   * @throws EntityNotFoundException
+   * @throws ExecutorException
+   */
   public Ingredient searchByName(String name) throws ExecutorException {
     Ingredient ingredient = new Ingredient(name);
     List<ResponseSchema> response =
@@ -29,6 +37,11 @@ public class IngredientService extends EntityService {
     return ingredient;
   }
 
+  /**
+   * Returns a list of all the Ingredients in the database.
+   * @return
+   * @throws ExecutorException
+   */
   public List<Ingredient> searchAll() throws ExecutorException {
     List<ResponseSchema> response =
         executorService.executeSelect(Ingredient.TABLE_NAME, Ingredient.ENTITY_FIELDS);

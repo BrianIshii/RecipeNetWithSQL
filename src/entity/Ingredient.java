@@ -7,9 +7,7 @@ public class Ingredient extends Entity {
   public static final String IID = "iid";
   public static final String NAME = "name";
   public static final Schema ENTITY_FIELDS =
-      new Schema()
-          .addField(Long.class, IID, null, true)
-          .addField(String.class, NAME, null, false);
+      new Schema().addField(Long.class, IID, true).addField(String.class, NAME, false);
 
   public Ingredient(Long iid, String name) {
     initializeFields(iid, name);

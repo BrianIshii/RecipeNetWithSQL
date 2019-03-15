@@ -38,7 +38,12 @@ public class InstructionService extends EntityService {
     return instructions;
   }
 
-  public void clearRecipeInstructions(Long rid) throws ExecutorException {
+  /**
+   * Deletes all Instructions that contain the given rid.
+    * @param rid
+   * @throws ExecutorException
+   */
+  public void deleteRecipeInstructions(Long rid) throws ExecutorException {
     executorService.executeDelete(
         Instruction.TABLE_NAME, new Field<>(Long.class, Instruction.RID, rid));
   }

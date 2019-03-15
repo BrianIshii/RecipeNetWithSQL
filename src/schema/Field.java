@@ -22,6 +22,13 @@ public class Field<T> {
         this.type = type;
     }
 
+    public Field(Class<T> type, String key, boolean isPrimaryKey) {
+        this.key = key;
+        this.value = null;
+        this.isPrimaryKey = isPrimaryKey;
+        this.type = type;
+    }
+
     public String getKey() {
         return key;
     }

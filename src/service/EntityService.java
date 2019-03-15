@@ -1,7 +1,7 @@
 package service;
 
 import entity.Entity;
-import exception.ExecutorException;
+import exception.*;
 import schema.Field;
 import schema.RequestSchema;
 import schema.ResponseSchema;
@@ -26,9 +26,6 @@ public abstract class EntityService {
         return create(entity);
       case DIRTY:
         return commit(entity);
-      case DELETED_LOCALLY:
-        delete(entity);
-        return null;
       case SYNCED:
       default:
         return entity;
@@ -56,6 +53,9 @@ public abstract class EntityService {
    * @param entity
    * @param <E>
    * @return
+   * @throws NoRowsAffectedException
+   * @throws DuplicateEntryException
+   * @throws ExecutorException
    */
   protected <E extends Entity> E create(E entity) throws ExecutorException {
     RequestSchema primaryFields = new RequestSchema(entity.getPrimaryFields());
@@ -74,6 +74,8 @@ public abstract class EntityService {
    * @param entity
    * @param <E>
    * @return
+   * @throws NoRowsAffectedException
+   * @throws ExecutorException
    */
   protected <E extends Entity> E commit(E entity) throws ExecutorException {
     RequestSchema primaryFields = new RequestSchema(entity.getPrimaryFields());

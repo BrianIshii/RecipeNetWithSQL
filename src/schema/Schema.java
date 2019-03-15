@@ -30,6 +30,12 @@ public class Schema {
         return (S) this;
     }
 
+    public <S extends Schema, T extends Object> S addField(
+            Class<T> type, String key, boolean isPrimary) {
+        this.fields.add(new Field<T>(type, key, isPrimary));
+        return (S) this;
+    }
+
     public List<Field> getFields() {
         return this.fields;
     }

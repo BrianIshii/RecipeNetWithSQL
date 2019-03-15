@@ -18,11 +18,14 @@ public class UserService extends EntityService {
   private UserService() {}
 
   /**
-   * Returns a fully populated User.
+   * Returns a fully populated User by searching for a tuple with both the email and
+   * password and extracting the values.
    *
    * @param email
    * @param password
    * @return
+   * @throws EntityNotFoundException
+   * @throws ExecutorException
    */
   public User authenticate(String email, String password) throws ExecutorException {
     User user = new User(email, password);
@@ -38,6 +41,14 @@ public class UserService extends EntityService {
     return user;
   }
 
+  /**
+   * Returns a list of users whose names fall within a certain edit distance of the given string.
+   *
+   * @param name
+   * @param maxEditDistance
+   * @return
+   * @throws ExecutorException
+   */
   public List<User> fuzzyNameSearch(String name, int maxEditDistance) throws ExecutorException {
     List<ResponseSchema> response =
         executorService.executeLevenshteinSelect(

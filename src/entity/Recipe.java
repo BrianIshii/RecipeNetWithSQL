@@ -15,13 +15,13 @@ public class Recipe extends Entity {
   public static final String DATE = "date";
   public static final String RATING = "rating";
   public static final Schema ENTITY_FIELDS =
-          new Schema()
+      new Schema()
           .addField(Long.class, RID, 0L, true)
-          .addField(String.class, TITLE, null, false)
-          .addField(String.class, URL, null, false)
-          .addField(Long.class, UID, null, false)
-          .addField(Date.class, DATE, null, false)
-          .addField(Integer.class, RATING, null, false);
+          .addField(String.class, TITLE, false)
+          .addField(String.class, URL, false)
+          .addField(Long.class, UID, false)
+          .addField(Date.class, DATE, false)
+          .addField(Integer.class, RATING, false);
 
   private User user;
   private List<IngredientRecipe> ingredients;

@@ -11,9 +11,9 @@ public class Instruction extends Entity {
   public static final Schema ENTITY_FIELDS =
       new Schema()
           .addField(Long.class, INSTRID, 0L, true)
-          .addField(Long.class, RID, null, false)
-          .addField(Integer.class, STEP, null, false)
-          .addField(String.class, DESCRIPTION, null, false);
+          .addField(Long.class, RID, false)
+          .addField(Integer.class, STEP, false)
+          .addField(String.class, DESCRIPTION, false);
 
   public Instruction(Long instrid, Long rid, Integer step, String description) {
     initializeFields(instrid, rid, step, description);

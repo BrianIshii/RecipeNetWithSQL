@@ -3,6 +3,7 @@ package service;
 import entity.*;
 import exception.EntityNotFoundException;
 import exception.ExecutorException;
+import exception.NoRowsAffectedException;
 import schema.ResponseSchema;
 
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ public class RecipeService extends EntityService {
    *
    * @param user
    * @return
+   * @throws ExecutorException
    */
   public List<Recipe> searchByUser(User user) throws ExecutorException {
     List<ResponseSchema> response =
@@ -47,6 +49,8 @@ public class RecipeService extends EntityService {
    *
    * @param rid
    * @return
+   * @throws EntityNotFoundException
+   * @throws ExecutorException
    */
   public Recipe searchById(Long rid) throws ExecutorException {
     Recipe foundRecipe = new Recipe(rid);
@@ -69,26 +73,40 @@ public class RecipeService extends EntityService {
     return foundRecipe;
   }
 
+  /**
+   * Deletes a recipe and all of it's children.
+   *
+   * @param recipe
+   * @throws ExecutorException
+   */
   public void delete(Recipe recipe) throws ExecutorException {
-    for (IngredientRecipe ir : recipe.getIngredients()) {
-      ingredientRecipeService.delete(ir); // Delete connections to ingredients
+    Long rid = (Long) recipe.getFieldValue(Recipe.RID);
+    try {
+      instructionService.deleteRecipeInstructions(rid);
+    } catch (NoRowsAffectedException nraf) {
+      // Recipe may not have had instructions
     }
-    for (Instruction i : recipe.getInstructions()) {
-      instructionService.delete(i); // Delete its instructions
+    try {
+      ingredientRecipeService.deleteRecipeIngredients(rid);
+    } catch (NoRowsAffectedException nraf) {
+      // Recipe may not have had ingredients
     }
+
     super.delete(recipe);
   }
 
+  /**
+   * Saves a Recipe and manages the state of all it's children.
+   *
+   * @param recipe
+   * @return
+   * @throws ExecutorException
+   */
   public Recipe save(Recipe recipe) throws ExecutorException {
     Status recipeStartStatus = recipe.getStatus();
-    if (recipeStartStatus
-        == Status.DELETED_LOCALLY) { // Intercept attempts to save locally deleted recipes
-      delete(recipe);
-      return null;
-    }
     Recipe temp = super.save(recipe);
 
-    if (recipeStartStatus == Status.NEW) { // Need to apply generated rid prior to save
+    if (recipeStartStatus == Status.NEW) { // Need to apply generated rid prior to saving children
       temp.getIngredients().stream()
           .forEach(i -> i.setFieldValue(Recipe.RID, temp.getFieldValue(Recipe.RID)));
       temp.getInstructions().stream()
@@ -98,15 +116,25 @@ public class RecipeService extends EntityService {
     // Save any updates to children and cleanses lists of deleted values
     for (Iterator<IngredientRecipe> iterator = recipe.getIngredients().iterator();
         iterator.hasNext(); ) {
+      IngredientRecipe ir = iterator.next();
+      if (ir.getStatus() == Status.DELETED_LOCALLY) {
+        try {
+          ingredientRecipeService.delete(ir);
+        } catch (EntityNotFoundException | NoRowsAffectedException ex) {
+          // Don't really care. It didn't exist to begin with
+        }
+        iterator.remove();
+      } else ingredientRecipeService.save(ir);
       if (ingredientRecipeService.save(iterator.next()) == null) iterator.remove();
     }
-    instructionService.clearRecipeInstructions((Long) recipe.getFieldValue(Recipe.RID));
+    instructionService.deleteRecipeInstructions((Long) recipe.getFieldValue(Recipe.RID));
     int step = 1;
     for (Iterator<Instruction> iterator = recipe.getInstructions().iterator();
         iterator.hasNext(); ) {
       Instruction i = iterator.next();
       i.setFieldValue("step", step);
       instructionService.save(i);
+      step++;
     }
     return temp;
   }
@@ -115,6 +143,7 @@ public class RecipeService extends EntityService {
    * Finds all recipes in the database. Does not load children. (LAZY)
    *
    * @return
+   * @throws ExecutorException
    */
   public List<Recipe> searchAll() throws ExecutorException {
     List<ResponseSchema> response =
