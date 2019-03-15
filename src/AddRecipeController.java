@@ -2,6 +2,8 @@ import entity.Ingredient;
 import entity.Instruction;
 import entity.Recipe;
 import entity.User;
+import exception.DuplicateEntryException;
+import exception.ExecutorException;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import service.RecipeService;
@@ -37,10 +39,18 @@ public class AddRecipeController extends BaseController {
             addAllInstructions(recipe);
 
             // Commit
-            recipeService.save(recipe);
+            try {
+                recipeService.save(recipe);
 
-            // Transit view
-            changeViewTo(HomeController.FXML);
+                // Transit view
+                changeViewTo(HomeController.FXML);
+            } catch(DuplicateEntryException dee) {
+                dee.printStackTrace();
+                //TODO add failure behavior
+            } catch(ExecutorException ee) {
+                ee.printStackTrace();
+                //TODO add failure behavior
+            }
         }
     }
 

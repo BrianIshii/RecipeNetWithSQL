@@ -4,6 +4,7 @@ import entity.Ingredient;
 import entity.Recipe;
 import entity.Status;
 import entity.User;
+import exception.ExecutorException;
 import org.junit.jupiter.api.*;
 import service.IngredientService;
 import service.RecipeService;
@@ -41,7 +42,7 @@ public class ServiceTests {
     }
 
     @Test
-    void saveUser() throws SQLException {
+    void saveUser() throws SQLException, ExecutorException {
       Util.clearUsers();
 
       user = userService.save(new User(USER_NAME, USER_EMAIL, USER_PASSWORD));
@@ -53,7 +54,7 @@ public class ServiceTests {
     }
 
     @Test
-    void authenticateUser() {
+    void authenticateUser() throws ExecutorException {
       user = userService.authenticate(USER_EMAIL, USER_PASSWORD);
       assertNotNull(user);
       assertEquals(Status.SYNCED, user.getStatus());
@@ -64,7 +65,7 @@ public class ServiceTests {
     }
 
     @Test
-    void updateUser() {
+    void updateUser() throws ExecutorException {
       final String newName = "rubbish";
       user = userService.authenticate(USER_EMAIL, USER_PASSWORD);
       assertNotNull(user, "Able to authenticate user");
@@ -85,24 +86,21 @@ public class ServiceTests {
     }
 
     @Test
-    void deleteUser() {
+    void deleteUser() throws ExecutorException {
       user = userService.authenticate(USER_EMAIL, USER_PASSWORD);
       assertNotNull(user);
-      user.setDeleted();
-
-      assertNull(userService.save(user));
+      userService.delete(user);
     }
 
     @Test
-    void saveLocallyDeletedUser() {
+    void saveLocallyDeletedUser() throws ExecutorException{
       user = userService.authenticate(USER_EMAIL, USER_PASSWORD);
 
-      user.setDeleted();
-      assertNull(userService.save(user));
+      userService.delete(user);
     }
 
     @Test
-    void fuzzyNameSearch() throws SQLException{
+    void fuzzyNameSearch() throws SQLException, ExecutorException{
       List<User> results = userService.fuzzyNameSearch(USER_NAME + "1", 5);
       results.stream()
           .filter(u -> u.getFieldValue("name").equals(USER_NAME))
@@ -111,7 +109,7 @@ public class ServiceTests {
     }
 
     @Test
-    void fuzzyNameSearchMultiple() {
+    void fuzzyNameSearchMultiple() throws ExecutorException {
       //Add two extra users with similar names
       userService.save(new User(USER_NAME+"1", USER_EMAIL+"2", USER_PASSWORD));
       userService.save(new User(USER_NAME+"2", USER_EMAIL+"3", USER_PASSWORD));
@@ -134,7 +132,7 @@ public class ServiceTests {
     }
 
     @Test
-    void saveIngredient() {
+    void saveIngredient() throws ExecutorException {
       Ingredient ingredient = new Ingredient("Rice");
       ingredient = ingredientService.save(ingredient);
       assertNotNull(ingredient);
@@ -143,7 +141,7 @@ public class ServiceTests {
     }
 
     @Test
-    void seachByName() {
+    void seachByName() throws ExecutorException {
       String thisIngredient = INGREDIENTS[0];
       Ingredient ingredient = ingredientService.searchByName(thisIngredient);
       assertNotNull(ingredient);
@@ -152,15 +150,14 @@ public class ServiceTests {
     }
 
     @Test
-    void saveLocallyDeletedIngredient() {
+    void saveLocallyDeletedIngredient() throws ExecutorException {
       Ingredient ingredient = new Ingredient("Rice");
-      ingredient.setDeleted();
-      ingredient = ingredientService.save(ingredient);
-      assertNull(ingredient);
+
+      ingredientService.delete(ingredient);
     }
 
     @Test
-    void searchAllIngredients() {
+    void searchAllIngredients() throws ExecutorException {
       List<Ingredient> ingredients = ingredientService.searchAll();
       assertEquals(INGREDIENTS.length, ingredients.size());
       for (Ingredient i : ingredients) {
@@ -169,14 +166,12 @@ public class ServiceTests {
     }
 
     @Test
-    void deleteIngredient() {
+    void deleteIngredient() throws ExecutorException{
       // Load an ingredient
       Ingredient ingredient = ingredientService.searchByName(INGREDIENTS[1]);
       assertNotNull(ingredient, "Ingredient was found");
 
-      ingredient.setDeleted();
-
-      assertNull(ingredientService.save(ingredient));
+      ingredientService.delete(ingredient);
     }
   }
 
@@ -184,13 +179,13 @@ public class ServiceTests {
   @DisplayName("Recipe Tests")
   class RecipeServiceTest {
     @BeforeEach
-    void beforeEach() throws SQLException {
+    void beforeEach() throws SQLException, ExecutorException {
       Util.initIngredients();
       Util.initRecipes();
     }
 
     @Test
-    void searchByUser() {
+    void searchByUser() throws ExecutorException{
       User user = userService.authenticate(USER_EMAIL, USER_PASSWORD);
       assertNotNull(user);
 
@@ -211,7 +206,7 @@ public class ServiceTests {
     }
 
     @Test
-    void searchAll() {
+    void searchAll() throws ExecutorException{
       List<Recipe> recipes = recipeService.searchAll();
       assertNotNull(recipes);
       assertEquals(1, recipes.size());
@@ -230,7 +225,7 @@ public class ServiceTests {
     }
 
     @Test
-    void saveRecipe() throws SQLException {
+    void saveRecipe() throws SQLException, ExecutorException {
       User user = userService.authenticate(USER_EMAIL, USER_PASSWORD);
       assertNotNull(user);
 
@@ -240,7 +235,7 @@ public class ServiceTests {
     }
 
     @Test
-    void searchByRid() throws SQLException {
+    void searchByRid() throws SQLException, ExecutorException {
       // Get a recipe to search by
       List<Recipe> recipes = recipeService.searchAll();
       assertNotNull(recipes);

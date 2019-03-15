@@ -1,4 +1,6 @@
 import entity.User;
+import exception.EntityNotFoundException;
+import exception.ExecutorException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -29,22 +31,25 @@ public class MainController {
     }
     @FXML
     public void loginButtonPressed(ActionEvent event) throws IOException {
-        // Login
-        User authenticatedUser = userService.authenticate(emailTextField.getText(), passwordTextField.getText());
+        try {
+            // Login
+            User authenticatedUser = userService.authenticate(emailTextField.getText(), passwordTextField.getText());
 
-        if (authenticatedUser != null) {
             // Transition to home view
             Main.setUser(authenticatedUser);
             Parent root = FXMLLoader.load(getClass().getResource("Home.fxml"));
             Main.getPrimaryStage().getScene().setRoot(root);
             root.requestFocus();
-        } else {
+        } catch (EntityNotFoundException enfe) {
             // Alarm that the credentials are not valid
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("");
             alert.setHeaderText(null);
             alert.setContentText("Credentials are not valid");
             alert.showAndWait();
+        } catch (ExecutorException ee) {
+            ee.printStackTrace();
+            //TODO determine behavior
         }
     }
 

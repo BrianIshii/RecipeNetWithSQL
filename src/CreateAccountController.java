@@ -1,5 +1,8 @@
 import entity.Entity;
 import entity.User;
+import exception.DuplicateEntryException;
+import exception.ExecutorException;
+import exception.NoRowsAffectedException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -31,9 +34,10 @@ public class CreateAccountController {
             UserService userService = UserService.getInstance();
 
             User newUser = new User(nameTextField.getText(), emailTextField.getText(), passwordTextField.getText());
-            Entity entity = userService.save(newUser);
 
-            if (entity != null) {
+            try{
+                Entity entity = userService.save(newUser);
+
                 // User create successfully message
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("");
@@ -45,7 +49,16 @@ public class CreateAccountController {
                 Main.setUser(newUser);
                 Parent root = FXMLLoader.load(getClass().getResource("Home.fxml"));
                 Main.getPrimaryStage().getScene().setRoot(root);
-            } else {
+            } catch (DuplicateEntryException dee) {
+                // Credentials were not unique
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("");
+                alert.setHeaderText(null);
+                alert.setContentText("Credentials already exist.");
+                alert.showAndWait();
+            } catch (NoRowsAffectedException rnaf) {
+                // May delete this branch if you want same behavior as ExecutorException
+            } catch(ExecutorException ee) {
                 // Something went wrong
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("");

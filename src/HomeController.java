@@ -1,5 +1,6 @@
 import entity.Recipe;
 import entity.User;
+import exception.ExecutorException;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -39,21 +40,27 @@ public class HomeController extends BaseController {
         user = Main.getUser();
         name.setText("Welcome, " + (user.getFieldValue("name")));
 
-        List<Recipe> recipes = recipeService.searchByUser(user);
+        try {
+            List<Recipe> recipes = recipeService.searchByUser(user);
 
-        for(Recipe r : recipes) {
-            recipeNameToRecipeID.put((String)r.getField("title").getValue()+(r.getField("rid").getValue()), (Long)(r.getField("rid").getValue()));
-            listView.getItems().add((String)r.getField("title").getValue()+(r.getField("rid").getValue()));
+            for(Recipe r : recipes) {
+                recipeNameToRecipeID.put((String)r.getField("title").getValue()+(r.getField("rid").getValue()), (Long)(r.getField("rid").getValue()));
+                listView.getItems().add((String)r.getField("title").getValue()+(r.getField("rid").getValue()));
+            }
+
+            listView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+                @Override
+                public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                    //System.out.println(recipeNameToRecipeID.get(observable.getFieldValue()));
+                    RecipeController.recipeID = recipeNameToRecipeID.get(observable.getValue());
+                    changeViewTo(RecipeController.FXML);
+                }
+            });
+        } catch (ExecutorException ee) {
+            ee.printStackTrace();
+            //TODO determine behavior
         }
 
-        listView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                //System.out.println(recipeNameToRecipeID.get(observable.getFieldValue()));
-                RecipeController.recipeID = recipeNameToRecipeID.get(observable.getValue());
-                changeViewTo(RecipeController.FXML);
-            }
-        });
     }
 
     public void logoutButtonPressed(ActionEvent event) throws IOException {

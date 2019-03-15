@@ -2,6 +2,8 @@ import entity.Ingredient;
 import entity.IngredientRecipe;
 import entity.Instruction;
 import entity.Recipe;
+import exception.EntityNotFoundException;
+import exception.ExecutorException;
 import service.RecipeService;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -38,7 +40,15 @@ public class RecipeController extends BaseController {
         forwardButton.setDisable(!canPressForwardButton());
 
         System.out.println("Recipe id: " + recipeID);
-        Recipe r = recipeService.searchById(recipeID);
+        Recipe r = null;
+        try{
+            r = recipeService.searchById(recipeID);
+        } catch(EntityNotFoundException enfe) {
+            //TODO add failure behavior
+        } catch (ExecutorException ee) {
+            //TODO add failure behavior
+        }
+
         for (IngredientRecipe i : r.getIngredients()) {
             String ingredientInfo = (i.getField("amount").getValue() + " " + i.getField("unit").getValue());
             ingredientsView.getItems().add(ingredientInfo);

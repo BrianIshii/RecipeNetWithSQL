@@ -8,6 +8,6 @@ public class NoRowsAffectedException extends ExecutorException {
         super(MSG, schema, query);
     }
     public NoRowsAffectedException(String query) {
-        super(new StringBuilder(MSG).append("Query: ").append(query).append("\n").toString());
+        super(new StringBuilder(MSG).append("\nQuery: ").append(query).append("\n").toString());
     }
 }

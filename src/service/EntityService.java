@@ -1,6 +1,7 @@
 package service;
 
 import entity.Entity;
+import entity.Status;
 import exception.*;
 import schema.Field;
 import schema.RequestSchema;
@@ -12,13 +13,15 @@ public abstract class EntityService {
   protected static ExecutorService executorService = ExecutorService.getInstance();
 
   /**
-   * Based on the state of the entity being saved, may create, update, or delete the entity in the
-   * database. This is the only way to interact with the database to ensure entities are being
-   * persisted in a predictable manner.
+   * Based on the state of the entity being saved, may create or update the entity in the *
+   * database.
    *
    * @param entity
    * @param <E>
    * @return
+   * @throws NoRowsAffectedException
+   * @throws DuplicateEntryException
+   * @throws ExecutorException
    */
   public <E extends Entity> E save(E entity) throws ExecutorException {
     switch (entity.getStatus()) {
@@ -38,9 +41,11 @@ public abstract class EntityService {
    *
    * @param entity
    * @param <E>
-   * @return
+   * @throws NoRowsAffectedException
+   * @throws ExecutorException
    */
-  public <E extends Entity> void delete(E entity) throws ExecutorException{
+  public <E extends Entity> void delete(E entity) throws ExecutorException {
+    if(entity.getStatus() == Status.NEW) return;
     List<Field> primaryFields = entity.getPrimaryFields();
     executorService.executeDelete(entity.getTableName(), primaryFields);
   }

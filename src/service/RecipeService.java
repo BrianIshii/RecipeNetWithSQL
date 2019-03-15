@@ -100,6 +100,7 @@ public class RecipeService extends EntityService {
    *
    * @param recipe
    * @return
+   * @throws exception.DuplicateEntryException
    * @throws ExecutorException
    */
   public Recipe save(Recipe recipe) throws ExecutorException {

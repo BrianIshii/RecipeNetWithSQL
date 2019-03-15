@@ -1,6 +1,7 @@
 package ServiceTests;
 
 import entity.*;
+import exception.ExecutorException;
 import service.DatabaseConnection;
 import service.UserService;
 import utilities.DateUtils;
@@ -78,7 +79,7 @@ public class Util {
     }
   }
 
-  public static void initRecipes() throws SQLException {
+  public static void initRecipes() throws SQLException, ExecutorException {
     clearDB();
     clearInstructions();
     clearRecipes();

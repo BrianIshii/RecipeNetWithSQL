@@ -20,6 +20,7 @@ public class Ingredient extends Entity {
 
   public Ingredient(Long iid) {
     initializeFields(iid, null);
+    setDirty();
   }
 
   public Ingredient() {
