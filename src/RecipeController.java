@@ -49,8 +49,9 @@ public class RecipeController extends BaseController {
             //TODO add failure behavior
         }
 
-        for (IngredientRecipe i : r.getIngredients()) {
-            String ingredientInfo = (i.getField("amount").getValue() + " " + i.getField("unit").getValue());
+        for (IngredientRecipe ir : r.getIngredients()) {
+            Ingredient i = ir.getIngredient();
+            String ingredientInfo = (i.getFieldValue(Ingredient.NAME) + "/" + ir.getField("amount").getValue() + " " + ir.getField("unit").getValue());
             ingredientsView.getItems().add(ingredientInfo);
         }
 
