@@ -4,6 +4,8 @@ import entity.Recipe;
 import entity.User;
 import exception.DuplicateEntryException;
 import exception.ExecutorException;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import service.RecipeService;
@@ -26,10 +28,58 @@ public class AddRecipeController extends BaseController {
     @FXML TextField instructionTextField;
     @FXML ListView<String> ingredientsView = new ListView<>();
     @FXML ListView<String> instructionsView = new ListView<>();
+    @FXML private Button backButton;
+    @FXML private Button forwardButton;
+    private String selectedIngredient;
+    private String selectedInstruction;
 
     public AddRecipeController() {
         super(FXML);
     }
+    @FXML
+    public void initialize() {
+
+
+        backButton.setDisable(!canPressBackButton());
+        forwardButton.setDisable(!canPressForwardButton());
+
+        ingredientsView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                selectedIngredient = observable.getValue();
+            }
+        });
+
+        instructionsView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                selectedInstruction = observable.getValue();
+            }
+        });
+    }
+
+    public void deleteIngredientButtonPressed(ActionEvent event) throws IOException {
+        if (selectedIngredient == null) {
+            return;
+        }
+
+        ingredientsView.getItems().remove(selectedIngredient);
+
+        ingredientsView.getSelectionModel().clearSelection();
+        selectedIngredient = null;
+    }
+
+    public void deleteInstructionButtonPressed(ActionEvent event) throws IOException {
+        if (selectedInstruction == null) {
+            return;
+        }
+
+        instructionsView.getItems().remove(selectedInstruction);
+
+        instructionsView.getSelectionModel().clearSelection();
+        selectedInstruction = null;
+    }
+
 
     public void saveButtonPressed(ActionEvent event) throws IOException {
         resetTextFieldsStyle();

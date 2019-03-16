@@ -137,6 +137,8 @@
                 <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#forwardButtonPressed" text="&gt;" AnchorPane.rightAnchor="0.0" />
                 <Separator prefWidth="200.0" visible="false" />
                 <Button fx:id="homeButton" mnemonicParsing="false" onAction="#saveButtonPressed" text="Save" />
+                <Button fx:id="deleteIngredient" mnemonicParsing="false" onAction="#deleteIngredientButtonPressed" text="delete Ingredient" />
+                <Button fx:id="deleteInstruction" mnemonicParsing="false" onAction="#deleteInstructionButtonPressed" text="delete Instruction" />
             </items>
         </ToolBar>
     </children>
