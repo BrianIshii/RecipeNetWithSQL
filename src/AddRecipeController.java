@@ -12,6 +12,8 @@ import javafx.fxml.FXML;
 
 import java.io.IOException;
 import java.sql.Date;
+import java.util.Arrays;
+import java.util.List;
 
 public class AddRecipeController extends BaseController {
 
@@ -19,6 +21,8 @@ public class AddRecipeController extends BaseController {
 
     @FXML TextField recipeNameTextField;
     @FXML TextField ingredientTextField;
+    @FXML TextField amountTextField;
+    @FXML TextField unitTextField;
     @FXML TextField instructionTextField;
     @FXML ListView<String> ingredientsView = new ListView<>();
     @FXML ListView<String> instructionsView = new ListView<>();
@@ -58,12 +62,11 @@ public class AddRecipeController extends BaseController {
     public void addIngredientToList() {
         resetTextFieldsStyle();
 
-        if (isValidInput(ingredientTextField)) {
-            // Add to listView
-            ingredientsView.getItems().add(ingredientTextField.getText());
+        if (isValidIngredientInput()) {
+            String s = String.format("%s, %s, %s", ingredientTextField.getText(), amountTextField.getText(), unitTextField.getText());
+            ingredientsView.getItems().add(s);
 
-            // Clear textField
-            ingredientTextField.clear();
+            clearIngredientTextFields();
         }
     }
 
@@ -82,8 +85,9 @@ public class AddRecipeController extends BaseController {
 
     private void addAllIngredients(Recipe recipe) {
         for (String s: ingredientsView.getItems()) {
-            // TODO:: Change amount and unit
-            recipe.addIngredient(new Ingredient(s), 1, "cup");
+
+            List<String> fields = Arrays.asList(s.split(","));
+            recipe.addIngredient(new Ingredient(fields.get(0)), Integer.parseInt(fields.get(1)), fields.get(2));
         }
     }
 
@@ -94,7 +98,7 @@ public class AddRecipeController extends BaseController {
     }
 
     private boolean isValidInput(TextField textFiled) {
-        // Check empty fields
+
         if (textFiled.getText().isEmpty()) {
             alertTextField(textFiled);
 
@@ -110,6 +114,24 @@ public class AddRecipeController extends BaseController {
 
         return true;
     }
+
+    private boolean isValidIngredientInput() {
+
+        if (isValidInput(ingredientTextField) &&
+                isValidInput(amountTextField) &&
+                isValidInput(unitTextField)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void clearIngredientTextFields() {
+        ingredientTextField.clear();
+        amountTextField.clear();
+        unitTextField.clear();
+    }
+
 
     private void alertTextField(TextField textField) {
         textField.setStyle("-fx-text-box-border: red; -fx-focus-color: red;");
