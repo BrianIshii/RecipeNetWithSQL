@@ -136,7 +136,7 @@ public class AddRecipeController extends BaseController {
     private void addAllIngredients(Recipe recipe) {
         for (String s: ingredientsView.getItems()) {
 
-            List<String> fields = Arrays.asList(s.split(","));
+            List<String> fields = Arrays.asList(s.split(", "));
             recipe.addIngredient(new Ingredient(fields.get(0)), Integer.parseInt(fields.get(1)), fields.get(2));
         }
     }
