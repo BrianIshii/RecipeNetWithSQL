@@ -128,7 +128,7 @@ public class AddRecipeController extends BaseController {
 
     public void saveButtonPressed(ActionEvent event) throws IOException {
         // New recipe
-        Recipe recipe = new Recipe(recipeNameLabel.getText(), "url", Main.getUser(), new Date(20180101), 4);
+        Recipe recipe = new Recipe(recipeNameLabel.getText(), "", Main.getUser(), new Date(20180101), 4);
 
         // Add data
         addAllIngredients(recipe);
