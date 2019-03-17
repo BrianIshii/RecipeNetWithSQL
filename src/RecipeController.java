@@ -1,4 +1,3 @@
-import com.sun.deploy.uitoolkit.impl.fx.HostServicesFactory;
 import entity.Ingredient;
 import entity.IngredientRecipe;
 import entity.Instruction;
@@ -6,8 +5,6 @@ import entity.Recipe;
 import exception.EntityNotFoundException;
 import exception.ExecutorException;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import service.RecipeService;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -20,11 +17,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.util.Callback;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
 
 public class RecipeController extends BaseController {
     public static String FXML = "Recipe.fxml";
@@ -37,7 +30,6 @@ public class RecipeController extends BaseController {
     @FXML ListView<String> ingredientsView = new ListView<>();
     @FXML ListView<String> instructionsView = new ListView<>();
     @FXML Label recipeNameLabel;
-    @FXML ImageView image;
 
     public RecipeController() {
         super(FXML);
@@ -54,12 +46,6 @@ public class RecipeController extends BaseController {
         try{
             r = recipeService.searchById(recipeID);
             recipeNameLabel.setText((String)r.getFieldValue(Recipe.TITLE));
-            String url = (String)r.getFieldValue(Recipe.URL);
-            if (url != null &&
-                    "" != url && !url.isEmpty()) {
-                Image i = new Image((String)r.getFieldValue(Recipe.URL));
-                image.setImage(i);
-            }
         } catch(EntityNotFoundException enfe) {
             //TODO add failure behavior
         } catch (ExecutorException ee) {
