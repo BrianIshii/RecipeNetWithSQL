@@ -198,7 +198,7 @@ public class AddRecipeController extends BaseController {
 
     @FXML
     public void addInstructionButtonPressed() {
-        TextInputDialog dialog = new TextInputDialog(recipeNameLabel.getText());
+        TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("New Instruction Step");
         dialog.setHeaderText(null);
         dialog.setGraphic(null);
@@ -207,9 +207,7 @@ public class AddRecipeController extends BaseController {
         // Traditional way to get the response value.
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()){
-            if (!result.get().replaceAll("\\s+","").isEmpty()) {
-                addInstructionToList(result.get());
-            }
+            addInstructionToList(result.get());
         }
     }
 
