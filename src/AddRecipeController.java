@@ -1,4 +1,5 @@
 import View.AutoCompletionTextField;
+import View.Unit;
 import entity.Ingredient;
 import entity.Recipe;
 import exception.DuplicateEntryException;
@@ -24,6 +25,7 @@ public class AddRecipeController extends BaseController {
 
     public static String FXML = "AddRecipe.fxml";
     private static IngredientService ingredientService = IngredientService.getInstance();
+
     @FXML ListView<String> ingredientsView = new ListView<>();
     @FXML ListView<String> instructionsView = new ListView<>();
     @FXML Label recipeNameLabel;
