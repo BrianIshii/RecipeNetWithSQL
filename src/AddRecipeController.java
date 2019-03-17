@@ -31,6 +31,8 @@ public class AddRecipeController extends BaseController {
     @FXML Label recipeNameLabel;
     @FXML private Button backButton;
     @FXML private Button forwardButton;
+    @FXML Button removeIngredientButton;
+    @FXML Button removeInstructionButton;
     private String selectedIngredient;
     private String selectedInstruction;
     private Map<String, Ingredient> ingredients = new HashMap<>();
@@ -39,6 +41,7 @@ public class AddRecipeController extends BaseController {
     public AddRecipeController() {
         super(FXML);
     }
+
     @FXML
     public void initialize() {
 
@@ -54,6 +57,10 @@ public class AddRecipeController extends BaseController {
 
         backButton.setDisable(!canPressBackButton());
         forwardButton.setDisable(!canPressForwardButton());
+        removeIngredientButton.setOpacity(0.3);
+        removeInstructionButton.setOpacity(0.3);
+        removeIngredientButton.setDisable(true);
+        removeInstructionButton.setDisable(true);
 
         ingredientsView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -70,8 +77,16 @@ public class AddRecipeController extends BaseController {
         });
     }
 
-    public void deleteIngredientButtonPressed(ActionEvent event) throws IOException {
+    @FXML
+    public void removeIngredientButtonPressed(ActionEvent event) throws IOException {
         if (selectedIngredient == null) {
+            // Alert
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("");
+            alert.setHeaderText(null);
+            alert.setContentText("Select an ingredient to remove");
+            alert.showAndWait();
+
             return;
         }
 
@@ -79,10 +94,23 @@ public class AddRecipeController extends BaseController {
 
         ingredientsView.getSelectionModel().clearSelection();
         selectedIngredient = null;
+
+        if (ingredientsView.getItems().size() == 0) {
+            removeIngredientButton.setOpacity(0.3);
+            removeIngredientButton.setDisable(true);
+        }
     }
 
-    public void deleteInstructionButtonPressed(ActionEvent event) throws IOException {
+    @FXML
+    public void removeInstructionButtonPressed(ActionEvent event) throws IOException {
         if (selectedInstruction == null) {
+            // Alert
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("");
+            alert.setHeaderText(null);
+            alert.setContentText("Select an instruction to remove");
+            alert.showAndWait();
+
             return;
         }
 
@@ -90,6 +118,11 @@ public class AddRecipeController extends BaseController {
 
         instructionsView.getSelectionModel().clearSelection();
         selectedInstruction = null;
+
+        if (instructionsView.getItems().size() == 0) {
+            removeInstructionButton.setOpacity(0.3);
+            removeInstructionButton.setDisable(true);
+        }
     }
 
 
@@ -193,6 +226,9 @@ public class AddRecipeController extends BaseController {
             isValidInput(unit)) {
             String s = String.format("%s, %s, %s", name, amount, unit);
             ingredientsView.getItems().add(s);
+
+            removeIngredientButton.setOpacity(1.0);
+            removeIngredientButton.setDisable(false);
         }
     }
 
@@ -215,6 +251,9 @@ public class AddRecipeController extends BaseController {
         if (isValidInput(s)) {
             // Add to listView
             instructionsView.getItems().add(s);
+
+            removeInstructionButton.setOpacity(1.0);
+            removeInstructionButton.setDisable(false);
         }
     }
 

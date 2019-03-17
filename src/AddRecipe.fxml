@@ -47,33 +47,39 @@
                      </VBox.margin>
                   </HBox>
                   <BorderPane>
-                     <left>
-                        <HBox alignment="CENTER" BorderPane.alignment="CENTER">
-                           <children>
-                              <Label prefWidth="100.0" text="Ingredients">
-                                 <font>
-                                    <Font size="15.0" />
-                                 </font>
-                              </Label>
-                           </children>
-                           <BorderPane.margin>
-                              <Insets />
-                           </BorderPane.margin>
-                        </HBox>
-                     </left>
                      <VBox.margin>
                         <Insets bottom="5.0" left="30.0" right="30.0" />
                      </VBox.margin>
+                     <left>
+                        <Label prefWidth="100.0" text="Ingredients" BorderPane.alignment="CENTER">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </Label>
+                     </left>
                      <right>
-                        <Button mnemonicParsing="false" onAction="#addIngredientButtonPressed" style="-fx-background-color: transparent;" BorderPane.alignment="CENTER">
-                           <graphic>
-                              <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@resources/img/add.png" />
-                                 </image>
-                              </ImageView>
-                           </graphic>
-                        </Button>
+                        <HBox BorderPane.alignment="CENTER">
+                           <children>
+                              <Button mnemonicParsing="false" onAction="#addIngredientButtonPressed" style="-fx-background-color: transparent;">
+                                 <graphic>
+                                    <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@resources/img/add.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                              </Button>
+                              <Button fx:id="removeIngredientButton" mnemonicParsing="false" onAction="#removeIngredientButtonPressed" style="-fx-background-color: transparent;">
+                                 <graphic>
+                                    <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@resources/img/remove.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                              </Button>
+                           </children>
+                        </HBox>
                      </right></BorderPane>
                         <ListView fx:id="ingredientsView" prefHeight="200.0" prefWidth="200.0">
                             <VBox.margin>
@@ -81,33 +87,39 @@
                             </VBox.margin>
                         </ListView>
                   <BorderPane layoutX="40.0" layoutY="70.0">
-                     <left>
-                        <HBox alignment="CENTER" BorderPane.alignment="CENTER">
-                           <children>
-                              <Label prefWidth="100.0" text="Instructions">
-                                 <font>
-                                    <Font size="15.0" />
-                                 </font>
-                              </Label>
-                           </children>
-                           <BorderPane.margin>
-                              <Insets />
-                           </BorderPane.margin>
-                        </HBox>
-                     </left>
                      <VBox.margin>
                         <Insets bottom="5.0" left="30.0" right="30.0" />
                      </VBox.margin>
+                     <left>
+                        <Label prefWidth="100.0" text="Instructions" BorderPane.alignment="CENTER">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </Label>
+                     </left>
                      <right>
-                        <Button mnemonicParsing="false" onAction="#addInstructionButtonPressed" style="-fx-background-color: transparent;" BorderPane.alignment="CENTER">
-                           <graphic>
-                              <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@resources/img/add.png" />
-                                 </image>
-                              </ImageView>
-                           </graphic>
-                        </Button>
+                        <HBox BorderPane.alignment="CENTER">
+                           <children>
+                              <Button mnemonicParsing="false" onAction="#addInstructionButtonPressed" style="-fx-background-color: transparent;">
+                                 <graphic>
+                                    <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@resources/img/add.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                              </Button>
+                              <Button fx:id="removeInstructionButton" mnemonicParsing="false" onAction="#removeInstructionButtonPressed" style="-fx-background-color: transparent;">
+                                 <graphic>
+                                    <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@resources/img/remove.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                              </Button>
+                           </children>
+                        </HBox>
                      </right>
                   </BorderPane>
                         <ListView fx:id="instructionsView" prefHeight="200.0" prefWidth="200.0">
@@ -125,8 +137,6 @@
                 <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#forwardButtonPressed" text="&gt;" AnchorPane.rightAnchor="0.0" />
                 <Separator prefWidth="200.0" visible="false" />
                 <Button fx:id="homeButton" mnemonicParsing="false" onAction="#saveButtonPressed" text="Save" />
-                <Button fx:id="deleteIngredient" mnemonicParsing="false" onAction="#deleteIngredientButtonPressed" text="delete Ingredient" />
-                <Button fx:id="deleteInstruction" mnemonicParsing="false" onAction="#deleteInstructionButtonPressed" text="delete Instruction" />
             </items>
         </ToolBar>
     </children>
