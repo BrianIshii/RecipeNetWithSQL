@@ -5,6 +5,8 @@ import entity.Recipe;
 import exception.EntityNotFoundException;
 import exception.ExecutorException;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import service.RecipeService;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -27,6 +29,7 @@ public class RecipeController extends BaseController {
 
     @FXML private Button backButton;
     @FXML private Button forwardButton;
+    @FXML ImageView image;
     @FXML ListView<String> ingredientsView = new ListView<>();
     @FXML ListView<String> instructionsView = new ListView<>();
     @FXML Label recipeNameLabel;
@@ -46,6 +49,12 @@ public class RecipeController extends BaseController {
         try{
             r = recipeService.searchById(recipeID);
             recipeNameLabel.setText((String)r.getFieldValue(Recipe.TITLE));
+            String url = (String)r.getFieldValue(Recipe.URL);
+            if (url != null &&
+                    "" != url && !url.isEmpty()) {
+                Image i = new Image((String)r.getFieldValue(Recipe.URL));
+                image.setImage(i);
+            }
         } catch(EntityNotFoundException enfe) {
             //TODO add failure behavior
         } catch (ExecutorException ee) {
