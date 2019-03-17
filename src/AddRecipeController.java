@@ -3,9 +3,15 @@ import entity.Ingredient;
 import entity.Recipe;
 import exception.DuplicateEntryException;
 import exception.ExecutorException;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 import service.IngredientService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,14 +24,9 @@ public class AddRecipeController extends BaseController {
 
     public static String FXML = "AddRecipe.fxml";
     private static IngredientService ingredientService = IngredientService.getInstance();
-    @FXML AutoCompletionTextField ingredientTextField = new AutoCompletionTextField();
-    @FXML TextField amountTextField;
-    @FXML TextField unitTextField;
-    @FXML TextField instructionTextField;
     @FXML ListView<String> ingredientsView = new ListView<>();
     @FXML ListView<String> instructionsView = new ListView<>();
     @FXML Label recipeNameLabel;
-    @FXML Button recipeNameButton;
     @FXML private Button backButton;
     @FXML private Button forwardButton;
     private String selectedIngredient;
@@ -48,8 +49,6 @@ public class AddRecipeController extends BaseController {
         } catch (ExecutorException e) {
             e.printStackTrace();
         }
-
-        ingredientTextField.getEntries().addAll(listOfIngredients);
 
         backButton.setDisable(!canPressBackButton());
         forwardButton.setDisable(!canPressForwardButton());
@@ -93,8 +92,6 @@ public class AddRecipeController extends BaseController {
 
 
     public void saveButtonPressed(ActionEvent event) throws IOException {
-        resetTextFieldsStyle();
-
         // New recipe
         Recipe recipe = new Recipe(recipeNameLabel.getText(), "url", Main.getUser(), new Date(20180101), 4);
 
@@ -118,7 +115,7 @@ public class AddRecipeController extends BaseController {
     }
 
     @FXML
-    public void changeRecipeName() {
+    public void changeRecipeNameButtonPressed() {
         TextInputDialog dialog = new TextInputDialog(recipeNameLabel.getText());
         dialog.setTitle("Rename Recipe");
         dialog.setHeaderText(null);
@@ -135,27 +132,88 @@ public class AddRecipeController extends BaseController {
     }
 
     @FXML
-    public void addIngredientToList() {
-        resetTextFieldsStyle();
+    public void addIngredientButtonPressed() {
+        Dialog<AddIngredientResult> dialog = new Dialog<>();
+        dialog.setTitle("Add Ingredient");
+        dialog.setHeaderText(null);
+        dialog.setGraphic(null);
 
-        if (isValidIngredientInput()) {
-            String s = String.format("%s, %s, %s", ingredientTextField.getText(), amountTextField.getText(), unitTextField.getText());
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        // Name
+        Label nameLabel = new Label("Ingredient Name:");
+        nameLabel.setPrefWidth(150);
+        nameLabel.setAlignment(Pos.CENTER_RIGHT);
+        nameLabel.setPadding(new Insets(0, 5, 0, 0));
+        AutoCompletionTextField nameTextField = new AutoCompletionTextField();
+        nameTextField.getEntries().addAll(listOfIngredients);
+        HBox hbox1 = new HBox(nameLabel, nameTextField);
+        hbox1.setAlignment(Pos.CENTER);
+
+        // Amount
+        Label amountLabel = new Label("Amount:");
+        amountLabel.setPrefWidth(150);
+        amountLabel.setAlignment(Pos.CENTER_RIGHT);
+        amountLabel.setPadding(new Insets(0, 5, 0, 0));
+        TextField amountTextField = new TextField();
+        HBox hbox2 = new HBox(amountLabel, amountTextField);
+        hbox2.setAlignment(Pos.CENTER);
+
+        // Unit
+        Label unitLabel = new Label("Unit:");
+        unitLabel.setPrefWidth(150);
+        unitLabel.setAlignment(Pos.CENTER_RIGHT);
+        unitLabel.setPadding(new Insets(0, 5, 0, 0));
+        TextField unitTextField = new TextField();
+        HBox hbox3 = new HBox(unitLabel, unitTextField);
+        hbox3.setAlignment(Pos.CENTER);
+
+        dialogPane.setContent(new VBox(8, hbox1, hbox2, hbox3));
+        Platform.runLater(nameTextField::requestFocus);
+        dialog.setResultConverter((ButtonType button) -> {
+            if (button == ButtonType.OK) {
+                return new AddIngredientResult(nameTextField.getText(),
+                        amountTextField.getText(), unitTextField.getText());
+            }
+            return null;
+        });
+        Optional<AddIngredientResult> optionalResult = dialog.showAndWait();
+        optionalResult.ifPresent((AddIngredientResult result) -> {
+            addIngredientToList(result.name, result.amount, result.unit);
+        });
+    }
+
+    private void addIngredientToList(String name, String amount, String unit) {
+        if (isValidInput(name) &&
+            isValidInput(amount) &&
+            isValidInput(unit)) {
+            String s = String.format("%s, %s, %s", name, amount, unit);
             ingredientsView.getItems().add(s);
-
-            clearIngredientTextFields();
         }
     }
 
     @FXML
-    public void addInstructionToList() {
-        resetTextFieldsStyle();
+    public void addInstructionButtonPressed() {
+        TextInputDialog dialog = new TextInputDialog(recipeNameLabel.getText());
+        dialog.setTitle("New Instruction Step");
+        dialog.setHeaderText(null);
+        dialog.setGraphic(null);
+        dialog.setContentText("Instruction Step:");
 
-        if (isValidInput(instructionTextField)) {
+        // Traditional way to get the response value.
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            if (!result.get().replaceAll("\\s+","").isEmpty()) {
+                addInstructionToList(result.get());
+            }
+        }
+    }
+
+    private void addInstructionToList(String s) {
+        if (isValidInput(s)) {
             // Add to listView
-            instructionsView.getItems().add(instructionTextField.getText());
-
-            // Clear textField
-            instructionTextField.clear();
+            instructionsView.getItems().add(s);
         }
     }
 
@@ -177,11 +235,8 @@ public class AddRecipeController extends BaseController {
         }
     }
 
-    private boolean isValidInput(TextField textFiled) {
-
-        if (textFiled.getText().isEmpty()) {
-            alertTextField(textFiled);
-
+    private boolean isValidInput(String s) {
+        if (s.isEmpty()) {
             // Alert
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("");
@@ -195,30 +250,14 @@ public class AddRecipeController extends BaseController {
         return true;
     }
 
-    private boolean isValidIngredientInput() {
+    private static class AddIngredientResult {
 
-        if (isValidInput(ingredientTextField) &&
-                isValidInput(amountTextField) &&
-                isValidInput(unitTextField)) {
-            return true;
+        String name, amount, unit;
+
+        public AddIngredientResult(String name, String amount, String unit) {
+            this.name = name;
+            this.amount = amount;
+            this.unit = unit;
         }
-
-        return false;
-    }
-
-    private void clearIngredientTextFields() {
-        ingredientTextField.clear();
-        amountTextField.clear();
-        unitTextField.clear();
-    }
-
-
-    private void alertTextField(TextField textField) {
-        textField.setStyle("-fx-text-box-border: red; -fx-focus-color: red;");
-    }
-
-    private void resetTextFieldsStyle() {
-        ingredientTextField.setStyle("");
-        instructionTextField.setStyle("");
     }
 }

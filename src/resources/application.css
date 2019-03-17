@@ -1,0 +1,14 @@
+#noFocusButton {
+	-fx-background-color: #E0E0E0;
+	-fx-border-width: 0px;
+    -fx-background-insets: 0, 1, 2;
+    -fx-background-radius: 0;
+}
+
+#noFocusButton:pressed {
+	-fx-background-color: #B2B2B2;
+}
+
+#pressedImageView:pressed {
+    -fx-background-color: #B2B2B2;
+}

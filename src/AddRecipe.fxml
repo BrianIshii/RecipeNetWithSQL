@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import View.AutoCompletionTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -33,7 +32,7 @@
                               <Insets left="10.0" right="10.0" />
                            </HBox.margin>
                         </Label>
-                        <Button fx:id="recipeNameButton" mnemonicParsing="false" onAction="#changeRecipeName" style="-fx-background-color: transparent;">
+                        <Button mnemonicParsing="false" onAction="#changeRecipeNameButtonPressed" style="-fx-background-color: transparent;">
                            <graphic>
                               <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -47,78 +46,70 @@
                         <Insets bottom="15.0" top="15.0" />
                      </VBox.margin>
                   </HBox>
-                  <HBox alignment="CENTER">
-                     <children>
-                        <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Add Ingredient">
-                           <HBox.margin>
-                              <Insets right="20.0" />
-                           </HBox.margin>
-                           <font>
-                              <Font size="15.0" />
-                           </font>
-                        </Label>
-                         <AutoCompletionTextField fx:id="ingredientTextField" maxHeight="250.0" prefWidth="200.0" />
-                         <Label alignment="CENTER_RIGHT" prefWidth="70.0" text="Amount">
-                             <HBox.margin>
-                                 <Insets left="10.0" />
-                                 <Insets right="10.0" />
-                             </HBox.margin>
-                             <font>
-                                 <Font size="15.0" />
-                             </font>
-                         </Label>
-                         <TextField fx:id="amountTextField" maxHeight="250.0" prefWidth="50.0" />
-                         <Label alignment="CENTER_RIGHT" prefWidth="50.0" text="Unit">
-                             <HBox.margin>
-                                 <Insets right="10.0" />
-                             </HBox.margin>
-                             <font>
-                                 <Font size="15.0" />
-                             </font>
-                         </Label>
-                         <TextField fx:id="unitTextField" maxHeight="250.0" prefWidth="50.0" />
-                        <Button mnemonicParsing="false" onAction="#addIngredientToList" text="+">
-                           <HBox.margin>
-                              <Insets left="10.0" />
-                           </HBox.margin>
-                        </Button>
-                     </children>
+                  <BorderPane>
+                     <left>
+                        <HBox alignment="CENTER" BorderPane.alignment="CENTER">
+                           <children>
+                              <Label prefWidth="100.0" text="Ingredients">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                           <BorderPane.margin>
+                              <Insets />
+                           </BorderPane.margin>
+                        </HBox>
+                     </left>
                      <VBox.margin>
-                        <Insets bottom="5.0" />
+                        <Insets bottom="5.0" left="30.0" right="30.0" />
                      </VBox.margin>
-                     <padding>
-                        <Insets bottom="5.0" />
-                     </padding>
-                  </HBox>
+                     <right>
+                        <Button mnemonicParsing="false" onAction="#addIngredientButtonPressed" style="-fx-background-color: transparent;" BorderPane.alignment="CENTER">
+                           <graphic>
+                              <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@resources/img/add.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                     </right></BorderPane>
                         <ListView fx:id="ingredientsView" prefHeight="200.0" prefWidth="200.0">
                             <VBox.margin>
-                                <Insets bottom="10.0" left="20.0" right="20.0" />
+                                <Insets bottom="20.0" left="20.0" right="20.0" />
                             </VBox.margin>
                         </ListView>
-                        <HBox alignment="CENTER">
-                            <children>
-                                <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Add Instruction">
-                                    <HBox.margin>
-                                        <Insets right="20.0" />
-                                    </HBox.margin>
-                                    <font>
-                                        <Font size="15.0" />
-                                    </font>
-                                </Label>
-                                <TextField fx:id="instructionTextField" maxHeight="250.0" prefWidth="250.0" />
-                                <Button mnemonicParsing="false" onAction="#addInstructionToList" text="+">
-                                    <HBox.margin>
-                                        <Insets left="10.0" />
-                                    </HBox.margin>
-                                </Button>
-                            </children>
-                            <VBox.margin>
-                                <Insets bottom="5.0" />
-                            </VBox.margin>
-                            <padding>
-                                <Insets bottom="5.0" />
-                            </padding>
+                  <BorderPane layoutX="40.0" layoutY="70.0">
+                     <left>
+                        <HBox alignment="CENTER" BorderPane.alignment="CENTER">
+                           <children>
+                              <Label prefWidth="100.0" text="Instructions">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                           <BorderPane.margin>
+                              <Insets />
+                           </BorderPane.margin>
                         </HBox>
+                     </left>
+                     <VBox.margin>
+                        <Insets bottom="5.0" left="30.0" right="30.0" />
+                     </VBox.margin>
+                     <right>
+                        <Button mnemonicParsing="false" onAction="#addInstructionButtonPressed" style="-fx-background-color: transparent;" BorderPane.alignment="CENTER">
+                           <graphic>
+                              <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@resources/img/add.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                     </right>
+                  </BorderPane>
                         <ListView fx:id="instructionsView" prefHeight="200.0" prefWidth="200.0">
                             <VBox.margin>
                                 <Insets bottom="10.0" left="20.0" right="20.0" />
