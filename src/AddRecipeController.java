@@ -28,6 +28,8 @@ public class AddRecipeController extends BaseController {
 
     @FXML ListView<String> ingredientsView = new ListView<>();
     @FXML ListView<String> instructionsView = new ListView<>();
+    @FXML AutoCompletionTextField ingredientTextField = new AutoCompletionTextField();
+    @FXML AutoCompletionTextField unitTextField = new AutoCompletionTextField();
     @FXML Label recipeNameLabel;
     @FXML private Button backButton;
     @FXML private Button forwardButton;
@@ -54,6 +56,9 @@ public class AddRecipeController extends BaseController {
         } catch (ExecutorException e) {
             e.printStackTrace();
         }
+
+        ingredientTextField.getEntries().addAll(listOfIngredients);
+        unitTextField.getEntries().addAll(Unit.units);
 
         backButton.setDisable(!canPressBackButton());
         forwardButton.setDisable(!canPressForwardButton());
@@ -128,7 +133,7 @@ public class AddRecipeController extends BaseController {
 
     public void saveButtonPressed(ActionEvent event) throws IOException {
         // New recipe
-        Recipe recipe = new Recipe(recipeNameLabel.getText(), "url", Main.getUser(), new Date(20180101), 4);
+        Recipe recipe = new Recipe(recipeNameLabel.getText(), "", Main.getUser(), new Date(20180101), 4);
 
         // Add data
         addAllIngredients(recipe);

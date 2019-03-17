@@ -7,6 +7,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
@@ -25,18 +26,14 @@
                <VBox.margin>
                   <Insets bottom="15.0" top="15.0" />
                </VBox.margin></Label>
-                  <BorderPane>
-                     <VBox.margin>
-                        <Insets bottom="5.0" left="30.0" right="30.0" />
-                     </VBox.margin>
-                     <left>
-                        <Label prefWidth="100.0" text="Ingredients" BorderPane.alignment="CENTER">
-                           <font>
-                              <Font size="15.0" />
-                           </font>
-                        </Label>
-                     </left>
-                  </BorderPane>
+                  <ImageView fx:id="image" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+             <Label text="Ingredients">
+               <font>
+                  <Font size="15.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="5.0" />
+               </VBox.margin></Label>
             <ListView fx:id="ingredientsView" prefHeight="200.0" prefWidth="200.0">
                <VBox.margin>
                   <Insets bottom="20.0" left="20.0" right="20.0" />
