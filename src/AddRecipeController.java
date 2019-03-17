@@ -1,28 +1,29 @@
+import View.AutoCompletionTextField;
 import entity.Ingredient;
-import entity.Instruction;
 import entity.Recipe;
-import entity.User;
 import exception.DuplicateEntryException;
 import exception.ExecutorException;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
-import javafx.scene.control.*;
-import service.RecipeService;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
+import service.IngredientService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
 import java.io.IOException;
 import java.sql.Date;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class AddRecipeController extends BaseController {
 
     public static String FXML = "AddRecipe.fxml";
-
+    private static IngredientService ingredientService = IngredientService.getInstance();
     @FXML TextField recipeNameTextField;
-    @FXML TextField ingredientTextField;
+    @FXML
+    AutoCompletionTextField ingredientTextField = new AutoCompletionTextField();
     @FXML TextField amountTextField;
     @FXML TextField unitTextField;
     @FXML TextField instructionTextField;
@@ -32,6 +33,8 @@ public class AddRecipeController extends BaseController {
     @FXML private Button forwardButton;
     private String selectedIngredient;
     private String selectedInstruction;
+    private Map<String, Ingredient> ingredients = new HashMap<>();
+    private List<String> listOfIngredients = new ArrayList<>();
 
     public AddRecipeController() {
         super(FXML);
@@ -39,6 +42,17 @@ public class AddRecipeController extends BaseController {
     @FXML
     public void initialize() {
 
+        try {
+            for (Ingredient i : ingredientService.searchAll()) {
+                String name = (String)i.getField(Ingredient.NAME).getValue();
+                ingredients.put(name, i);
+                listOfIngredients.add(name);
+            }
+        } catch (ExecutorException e) {
+            e.printStackTrace();
+        }
+
+        ingredientTextField.getEntries().addAll(listOfIngredients);
 
         backButton.setDisable(!canPressBackButton());
         forwardButton.setDisable(!canPressForwardButton());
