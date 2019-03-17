@@ -76,7 +76,7 @@
                                  <Font size="15.0" />
                              </font>
                          </Label>
-                         <TextField fx:id="unitTextField" maxHeight="250.0" prefWidth="50.0" />
+                         <AutoCompletionTextField fx:id="unitTextField" maxHeight="250.0" prefWidth="50.0" />
                         <Button mnemonicParsing="false" onAction="#addIngredientToList" text="+">
                            <HBox.margin>
                               <Insets left="10.0" />

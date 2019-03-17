@@ -1,4 +1,5 @@
 import View.AutoCompletionTextField;
+import View.Unit;
 import entity.Ingredient;
 import entity.Recipe;
 import exception.DuplicateEntryException;
@@ -20,7 +21,7 @@ public class AddRecipeController extends BaseController {
     private static IngredientService ingredientService = IngredientService.getInstance();
     @FXML AutoCompletionTextField ingredientTextField = new AutoCompletionTextField();
     @FXML TextField amountTextField;
-    @FXML TextField unitTextField;
+    @FXML AutoCompletionTextField unitTextField = new AutoCompletionTextField();
     @FXML TextField instructionTextField;
     @FXML ListView<String> ingredientsView = new ListView<>();
     @FXML ListView<String> instructionsView = new ListView<>();
@@ -50,7 +51,8 @@ public class AddRecipeController extends BaseController {
         }
 
         ingredientTextField.getEntries().addAll(listOfIngredients);
-
+        unitTextField.getEntries().addAll(Unit.units);
+        
         backButton.setDisable(!canPressBackButton());
         forwardButton.setDisable(!canPressForwardButton());
 
