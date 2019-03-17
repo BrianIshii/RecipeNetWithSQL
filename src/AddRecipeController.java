@@ -167,7 +167,8 @@ public class AddRecipeController extends BaseController {
         unitLabel.setPrefWidth(150);
         unitLabel.setAlignment(Pos.CENTER_RIGHT);
         unitLabel.setPadding(new Insets(0, 5, 0, 0));
-        TextField unitTextField = new TextField();
+        AutoCompletionTextField unitTextField = new AutoCompletionTextField();
+        unitTextField.getEntries().addAll(Unit.units);
         HBox hbox3 = new HBox(unitLabel, unitTextField);
         hbox3.setAlignment(Pos.CENTER);
 
