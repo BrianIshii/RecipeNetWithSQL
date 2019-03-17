@@ -5,10 +5,7 @@ import exception.DuplicateEntryException;
 import exception.ExecutorException;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import service.IngredientService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -21,14 +18,14 @@ public class AddRecipeController extends BaseController {
 
     public static String FXML = "AddRecipe.fxml";
     private static IngredientService ingredientService = IngredientService.getInstance();
-    @FXML TextField recipeNameTextField;
-    @FXML
-    AutoCompletionTextField ingredientTextField = new AutoCompletionTextField();
+    @FXML AutoCompletionTextField ingredientTextField = new AutoCompletionTextField();
     @FXML TextField amountTextField;
     @FXML TextField unitTextField;
     @FXML TextField instructionTextField;
     @FXML ListView<String> ingredientsView = new ListView<>();
     @FXML ListView<String> instructionsView = new ListView<>();
+    @FXML Label recipeNameLabel;
+    @FXML Button recipeNameButton;
     @FXML private Button backButton;
     @FXML private Button forwardButton;
     private String selectedIngredient;
@@ -98,26 +95,41 @@ public class AddRecipeController extends BaseController {
     public void saveButtonPressed(ActionEvent event) throws IOException {
         resetTextFieldsStyle();
 
-        if (isValidInput(recipeNameTextField)) {
-            // New recipe
-            Recipe recipe = new Recipe(recipeNameTextField.getText(), "url", Main.getUser(), new Date(20180101), 4);
+        // New recipe
+        Recipe recipe = new Recipe(recipeNameLabel.getText(), "url", Main.getUser(), new Date(20180101), 4);
 
-            // Add data
-            addAllIngredients(recipe);
-            addAllInstructions(recipe);
+        // Add data
+        addAllIngredients(recipe);
+        addAllInstructions(recipe);
 
-            // Commit
-            try {
-                recipeService.save(recipe);
+        // Commit
+        try {
+            recipeService.save(recipe);
 
-                // Transit view
-                changeViewTo(HomeController.FXML);
-            } catch(DuplicateEntryException dee) {
-                dee.printStackTrace();
-                //TODO add failure behavior
-            } catch(ExecutorException ee) {
-                ee.printStackTrace();
-                //TODO add failure behavior
+            // Transit view
+            changeViewTo(HomeController.FXML);
+        } catch(DuplicateEntryException dee) {
+            dee.printStackTrace();
+            //TODO add failure behavior
+        } catch(ExecutorException ee) {
+            ee.printStackTrace();
+            //TODO add failure behavior
+        }
+    }
+
+    @FXML
+    public void changeRecipeName() {
+        TextInputDialog dialog = new TextInputDialog(recipeNameLabel.getText());
+        dialog.setTitle("Rename Recipe");
+        dialog.setHeaderText(null);
+        dialog.setGraphic(null);
+        dialog.setContentText("Recipe Name:");
+
+        // Traditional way to get the response value.
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            if (!result.get().replaceAll("\\s+","").isEmpty()) {
+                recipeNameLabel.setText(result.get());
             }
         }
     }
@@ -206,7 +218,6 @@ public class AddRecipeController extends BaseController {
     }
 
     private void resetTextFieldsStyle() {
-        recipeNameTextField.setStyle("");
         ingredientTextField.setStyle("");
         instructionTextField.setStyle("");
     }

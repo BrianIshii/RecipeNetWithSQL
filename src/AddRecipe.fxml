@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import View.AutoCompletionTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -8,12 +9,12 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-
-<?import View.AutoCompletionTextField?>
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AddRecipeController">
     <children>
@@ -21,37 +22,31 @@
             <content>
                 <VBox alignment="CENTER" layoutX="250.0" layoutY="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <children>
-                        <Label text="Recipe">
-                            <font>
-                                <Font size="18.0" />
-                            </font>
-                            <VBox.margin>
-                                <Insets bottom="15.0" top="15.0" />
-                            </VBox.margin></Label>
-                        <HBox alignment="CENTER">
-                            <children>
-                                <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Recipe Name">
-                                    <HBox.margin>
-                                        <Insets right="20.0" />
-                                    </HBox.margin>
-                                    <font>
-                                        <Font size="15.0" />
-                                    </font>
-                                </Label>
-                                <TextField fx:id="recipeNameTextField" maxHeight="250.0" prefWidth="250.0" />
-                                <Button disable="true" mnemonicParsing="false" text="+" visible="false">
-                                    <HBox.margin>
-                                        <Insets left="10.0" />
-                                    </HBox.margin>
-                                </Button>
-                            </children>
-                            <VBox.margin>
-                                <Insets bottom="5.0" />
-                            </VBox.margin>
-                            <padding>
-                                <Insets bottom="5.0" />
-                            </padding>
-                        </HBox>
+                  <HBox alignment="CENTER">
+                     <children>
+                        <Button disable="true" mnemonicParsing="false" text="Button" visible="false" />
+                        <Label fx:id="recipeNameLabel" text="New Recipe">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets left="10.0" right="10.0" />
+                           </HBox.margin>
+                        </Label>
+                        <Button fx:id="recipeNameButton" mnemonicParsing="false" onAction="#changeRecipeName" style="-fx-background-color: transparent;">
+                           <graphic>
+                              <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@/resources/img/edit.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                     </children>
+                     <VBox.margin>
+                        <Insets bottom="15.0" top="15.0" />
+                     </VBox.margin>
+                  </HBox>
                   <HBox alignment="CENTER">
                      <children>
                         <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Add Ingredient">

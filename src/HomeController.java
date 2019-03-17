@@ -11,6 +11,7 @@ import javafx.scene.text.Text;
 import service.RecipeService;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,7 @@ public class HomeController extends BaseController {
     public static String FXML = "Home.fxml";
 
     private RecipeService recipeService = RecipeService.getInstance();
-    private Map<String, Long> recipeNameToRecipeID = new HashMap<String, Long>();
+    private ArrayList<Long> recipeIDArray = new ArrayList();
     private User user = Main.getUser();
 
     @FXML private Text name;
@@ -44,15 +45,15 @@ public class HomeController extends BaseController {
             List<Recipe> recipes = recipeService.searchByUser(user);
 
             for(Recipe r : recipes) {
-                recipeNameToRecipeID.put((String)r.getField("title").getValue()+(r.getField("rid").getValue()), (Long)(r.getField("rid").getValue()));
-                listView.getItems().add((String)r.getField("title").getValue()+(r.getField("rid").getValue()));
+                recipeIDArray.add((Long)r.getFieldValue(Recipe.RID));
+                listView.getItems().add((String)r.getField("title").getValue());
             }
 
             listView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
                 @Override
                 public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
                     //System.out.println(recipeNameToRecipeID.get(observable.getFieldValue()));
-                    RecipeController.recipeID = recipeNameToRecipeID.get(observable.getValue());
+                    RecipeController.recipeID = recipeIDArray.get(listView.getSelectionModel().getSelectedIndex());
                     changeViewTo(RecipeController.FXML);
                 }
             });

@@ -4,6 +4,7 @@ import entity.Instruction;
 import entity.Recipe;
 import exception.EntityNotFoundException;
 import exception.ExecutorException;
+import javafx.scene.control.Label;
 import service.RecipeService;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -28,6 +29,7 @@ public class RecipeController extends BaseController {
     @FXML private Button forwardButton;
     @FXML ListView<String> ingredientsView = new ListView<>();
     @FXML ListView<String> instructionsView = new ListView<>();
+    @FXML Label recipeNameLabel;
 
     public RecipeController() {
         super(FXML);
@@ -43,6 +45,7 @@ public class RecipeController extends BaseController {
         Recipe r = null;
         try{
             r = recipeService.searchById(recipeID);
+            recipeNameLabel.setText((String)r.getFieldValue(Recipe.TITLE));
         } catch(EntityNotFoundException enfe) {
             //TODO add failure behavior
         } catch (ExecutorException ee) {
