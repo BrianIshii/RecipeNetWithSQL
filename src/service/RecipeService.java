@@ -153,6 +153,27 @@ public class RecipeService extends EntityService {
     List<ResponseSchema> response =
         executorService.executeSelect(Recipe.TABLE_NAME, Recipe.ENTITY_FIELDS);
 
+    return getSelectedRecipes(response);
+  }
+
+  /**
+   * Returns a list of users whose names fall within a certain edit distance of the given string.
+   *
+   * @param name
+   * @param maxEditDistance
+   * @return
+   * @throws ExecutorException
+   */
+  public List<Recipe> fuzzyNameSearch(String name, int maxEditDistance) throws ExecutorException {
+    List<ResponseSchema> response =
+            executorService.executeLevenshteinSelect(
+                    Recipe.TABLE_NAME, Recipe.ENTITY_FIELDS, Recipe.TITLE, name, maxEditDistance);
+
+    return getSelectedRecipes(response);
+  }
+
+  private List<Recipe> getSelectedRecipes(List<ResponseSchema> response) {
+
     List<Recipe> recipes = new ArrayList<>();
     Recipe temp;
     for (ResponseSchema res : response) {
