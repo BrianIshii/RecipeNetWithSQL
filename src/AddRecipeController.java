@@ -372,7 +372,8 @@ public class AddRecipeController extends BaseController {
     private void addInstructionToList(String s) {
         if (isValidInput(s)) {
             // Add to listView
-            instructionsView.getItems().add(s);
+            int step = instructionsView.getItems().size()+1;
+            instructionsView.getItems().add(step + ". " + s);
 
             removeInstructionButton.setOpacity(1.0);
             removeInstructionButton.setDisable(false);
@@ -393,8 +394,7 @@ public class AddRecipeController extends BaseController {
 
     private void addAllInstructions(Recipe recipe) {
         for (String s: instructionsView.getItems()) {
-            System.out.println("instr: " + s);
-            recipe.addInstruction(s);
+            recipe.addInstruction(s.split(" ", 2)[1]);
         }
     }
 
