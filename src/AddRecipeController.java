@@ -90,7 +90,10 @@ public class AddRecipeController extends BaseController {
 
         if (currentRecipe != null) {
             recipeNameLabel.setText((String) currentRecipe.getFieldValue(Recipe.TITLE));
-
+            String url = (String) currentRecipe.getFieldValue(Recipe.URL);
+            if (!url.isEmpty()) {
+                recipeImageView.setImage(new Image(url));
+            }
             for(IngredientRecipe i : currentRecipe.getIngredients()) {
                 addIngredientToList(ingredientNameByID.get((Long)i.getFieldValue(IngredientRecipe.IID)),
                         i.getFieldValue(IngredientRecipe.AMOUNT).toString(),
@@ -131,9 +134,10 @@ public class AddRecipeController extends BaseController {
     public void saveButtonPressed(ActionEvent event) throws IOException {
         //String defaultImageURL = "resources/img/recipe_default.jpg";
 
+        Recipe recipe;
         if (currentRecipe == null) {
             // New recipe
-            Recipe recipe = new Recipe(recipeNameLabel.getText(),
+            recipe = new Recipe(recipeNameLabel.getText(),
                     imageURL,
                     Main.getUser(), new Date(20180101), 4);
 
@@ -141,23 +145,30 @@ public class AddRecipeController extends BaseController {
             addAllIngredients(recipe);
             addAllInstructions(recipe);
 
-            // Commit
-            try {
-                recipeService.save(recipe);
-
-                // Transit view
-                changeViewTo(HomeController.FXML);
-            } catch(DuplicateEntryException dee) {
-                dee.printStackTrace();
-                //TODO add failure behavior
-            } catch(ExecutorException ee) {
-                ee.printStackTrace();
-                //TODO add failure behavior
-                // New recipe
-            }
         } else {
+            currentRecipe.removeAllInstructions();
+
+            if (instructionsView.getItems().size() > 0) {
+                addAllInstructions(currentRecipe);
+            }
+
+            recipe = currentRecipe;
         }
 
+        // Commit
+        try {
+            recipeService.save(recipe);
+
+            // Transit view
+            changeViewTo(HomeController.FXML);
+        } catch(DuplicateEntryException dee) {
+            dee.printStackTrace();
+            //TODO add failure behavior
+        } catch(ExecutorException ee) {
+            ee.printStackTrace();
+            //TODO add failure behavior
+            // New recipe
+        }
         currentRecipe = null;
     }
 
@@ -232,6 +243,30 @@ public class AddRecipeController extends BaseController {
         });
     }
 
+    @FXML
+    public void removeInstructionButtonPressed(ActionEvent event) throws IOException {
+        if (selectedInstruction == null) {
+            // Alert
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("");
+            alert.setHeaderText(null);
+            alert.setContentText("Select an instruction to remove");
+            alert.showAndWait();
+
+            return;
+        }
+
+        instructionsView.getItems().remove(selectedInstruction);
+
+        instructionsView.getSelectionModel().clearSelection();
+        selectedInstruction = null;
+
+        if (instructionsView.getItems().size() == 0) {
+            removeInstructionButton.setOpacity(0.3);
+            removeInstructionButton.setDisable(true);
+        }
+    }
+
     private void addIngredientToList(String name, String amount, String unit) {
         if (isValidInput(name) &&
             isValidInput(amount) &&
@@ -283,6 +318,7 @@ public class AddRecipeController extends BaseController {
 
     private void addAllInstructions(Recipe recipe) {
         for (String s: instructionsView.getItems()) {
+            System.out.println("instr: " + s);
             recipe.addInstruction(s);
         }
     }

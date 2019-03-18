@@ -136,6 +136,7 @@ public class RecipeService extends EntityService {
     for (Iterator<Instruction> iterator = recipe.getInstructions().iterator();
         iterator.hasNext(); ) {
       Instruction i = iterator.next();
+      i.setNew();
       i.setFieldValue("step", step);
       instructionService.save(i);
       step++;

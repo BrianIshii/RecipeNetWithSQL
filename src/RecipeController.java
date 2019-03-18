@@ -45,14 +45,12 @@ public class RecipeController extends BaseController {
         backButton.setDisable(!canPressBackButton());
         forwardButton.setDisable(!canPressForwardButton());
 
-        System.out.println("Recipe id: " + recipeID);
         recipe = null;
         try{
             recipe = recipeService.searchById(recipeID);
             recipeNameLabel.setText((String)recipe.getFieldValue(Recipe.TITLE));
             String url = (String)recipe.getFieldValue(Recipe.URL);
-            if (url != null &&
-                    "" != url && !url.isEmpty()) {
+            if (!url.isEmpty()) {
                 Image i = new Image((String)recipe.getFieldValue(Recipe.URL));
                 image.setImage(i);
             } else {
@@ -73,7 +71,6 @@ public class RecipeController extends BaseController {
         for (Instruction i : recipe.getInstructions()) {
             String instructionInfo = (i.getField("step").getValue() + ". " + i.getField("description").getValue());
             instructionsView.getItems().add(instructionInfo);
-            System.out.println(instructionInfo);
         }
 
         ingredientsView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
