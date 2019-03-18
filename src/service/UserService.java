@@ -52,14 +52,28 @@ public class UserService extends EntityService {
     List<ResponseSchema> response =
         executorService.executeLevenshteinSelect(
             User.TABLE_NAME, User.ENTITY_FIELDS, User.NAME, name, maxEditDistance);
+
+    return getSelectedUsers(response);
+  }
+
+  public List<User> searchAll() throws ExecutorException {
+    List<ResponseSchema> response =
+            executorService.executeSelect(User.TABLE_NAME, User.ENTITY_FIELDS);
+
+    return getSelectedUsers(response);
+  }
+
+  private List<User> getSelectedUsers(List<ResponseSchema> response) {
+
     List<User> users = new ArrayList<>();
     User user;
     for (ResponseSchema res : response) {
-      user = new User();
+      user = new User(); // Dummy initializer, rid will be overridden
       res.applyValuesTo(user, true);
       user.setSynced();
       users.add(user);
     }
+
     return users;
   }
 }
