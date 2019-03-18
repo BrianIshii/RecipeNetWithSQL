@@ -16,7 +16,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.TextAlignment;
 import service.IngredientService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -125,30 +124,6 @@ public class AddRecipeController extends BaseController {
         if (ingredientsView.getItems().size() == 0) {
             removeIngredientButton.setOpacity(0.3);
             removeIngredientButton.setDisable(true);
-        }
-    }
-
-    @FXML
-    public void removeInstructionButtonPressed(ActionEvent event) throws IOException {
-        if (selectedInstruction == null) {
-            // Alert
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("");
-            alert.setHeaderText(null);
-            alert.setContentText("Select an instruction to remove");
-            alert.showAndWait();
-
-            return;
-        }
-
-        instructionsView.getItems().remove(selectedInstruction);
-
-        instructionsView.getSelectionModel().clearSelection();
-        selectedInstruction = null;
-
-        if (instructionsView.getItems().size() == 0) {
-            removeInstructionButton.setOpacity(0.3);
-            removeInstructionButton.setDisable(true);
         }
     }
 

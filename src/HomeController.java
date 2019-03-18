@@ -1,3 +1,4 @@
+import View.AutoCompletionTextField;
 import entity.Recipe;
 import entity.User;
 import exception.ExecutorException;
@@ -9,17 +10,17 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.text.Text;
 import service.RecipeService;
+import service.UserService;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class HomeController extends BaseController {
     public static String FXML = "Home.fxml";
 
     private RecipeService recipeService = RecipeService.getInstance();
+    private UserService userService = UserService.getInstance();
     private ArrayList<Long> recipeIDArray = new ArrayList();
     private User user = Main.getUser();
 
@@ -27,6 +28,7 @@ public class HomeController extends BaseController {
     @FXML private Button backButton;
     @FXML private Button forwardButton;
     @FXML ListView<String> listView = new ListView<>();
+    @FXML private AutoCompletionTextField searchField = new AutoCompletionTextField();
 
     public HomeController() {
         super(FXML);
@@ -62,6 +64,25 @@ public class HomeController extends BaseController {
             //TODO determine behavior
         }
 
+        // initialize search autocompletion
+        List<String> listOfRecipes = new ArrayList<>();
+        List<String> listOfUsers = new ArrayList<>();
+        try {
+            for (Recipe r : recipeService.searchAll()) {
+                String title = (String)r.getField(Recipe.TITLE).getValue();
+                listOfRecipes.add(title);
+            }
+            for (User u : userService.searchAll()) {
+                String name = (String)u.getField(User.NAME).getValue();
+                listOfUsers.add(name);
+            }
+        } catch (ExecutorException e) {
+            e.printStackTrace();
+        }
+
+        searchField.getEntries().addAll(listOfRecipes);
+        searchField.getEntries().addAll(listOfUsers);
+
     }
 
     public void logoutButtonPressed(ActionEvent event) throws IOException {
@@ -70,6 +91,11 @@ public class HomeController extends BaseController {
 
     public void addRecipeButtonPressed(ActionEvent event) throws IOException {
         changeViewTo(AddRecipeController.FXML);
+    }
+
+    public void onSearch(ActionEvent event) {
+
+        System.out.println(searchField.getCharacters());
     }
 
 

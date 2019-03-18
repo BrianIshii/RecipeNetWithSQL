@@ -68,6 +68,9 @@
                            </graphic>
                         </Button>
                      </children>
+                     <VBox.margin>
+                        <Insets bottom="15.0" />
+                     </VBox.margin>
                   </StackPane>
                   <BorderPane>
                      <VBox.margin>
