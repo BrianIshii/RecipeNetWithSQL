@@ -187,7 +187,10 @@ public class AddRecipeController extends BaseController {
         } else {
 
             currentRecipe.setFieldValue(Recipe.TITLE,recipeNameLabel.getText());
-            currentRecipe.setFieldValue(Recipe.URL, imageURL);
+            
+            if (!imageURL.isEmpty()) {
+                currentRecipe.setFieldValue(Recipe.URL, imageURL);
+            }
             for(IngredientRecipe i : currentRecipe.getIngredients()) {
                 currentRecipe.removeIngredient((Long)i.getFieldValue(IngredientRecipe.IID));
             }
