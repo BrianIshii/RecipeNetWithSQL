@@ -146,6 +146,21 @@ public class AddRecipeController extends BaseController {
             addAllIngredients(recipe);
             addAllInstructions(recipe);
 
+            // Commit
+            try {
+                recipeService.save(recipe);
+
+                // Transit view
+                changeViewTo(HomeController.FXML);
+            } catch(DuplicateEntryException dee) {
+                dee.printStackTrace();
+                //TODO add failure behavior
+            } catch(ExecutorException ee) {
+                ee.printStackTrace();
+                //TODO add failure behavior
+                // New recipe
+            }
+            currentRecipe = null;
         } else {
 
             currentRecipe.setFieldValue(Recipe.TITLE,recipeNameLabel.getText());
@@ -162,23 +177,24 @@ public class AddRecipeController extends BaseController {
             }
 
             recipe = currentRecipe;
-        }
 
-        // Commit
-        try {
-            recipeService.save(recipe);
+            // Commit
+            try {
+                recipeService.save(recipe);
 
-            // Transit view
-            changeViewTo(HomeController.FXML);
-        } catch(DuplicateEntryException dee) {
-            dee.printStackTrace();
-            //TODO add failure behavior
-        } catch(ExecutorException ee) {
-            ee.printStackTrace();
-            //TODO add failure behavior
-            // New recipe
+                // Transit view
+                RecipeController.recipeID = (Long) currentRecipe.getFieldValue(Recipe.RID);
+                changeViewTo(RecipeController.FXML);
+            } catch(DuplicateEntryException dee) {
+                dee.printStackTrace();
+                //TODO add failure behavior
+            } catch(ExecutorException ee) {
+                ee.printStackTrace();
+                //TODO add failure behavior
+                // New recipe
+            }
+            currentRecipe = null;
         }
-        currentRecipe = null;
     }
 
     @FXML
