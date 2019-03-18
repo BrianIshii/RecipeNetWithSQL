@@ -94,6 +94,7 @@ public class AddRecipeController extends BaseController {
             if (!url.isEmpty()) {
                 recipeImageView.setImage(new Image(url));
             }
+
             for(IngredientRecipe i : currentRecipe.getIngredients()) {
                 addIngredientToList(ingredientNameByID.get((Long)i.getFieldValue(IngredientRecipe.IID)),
                         i.getFieldValue(IngredientRecipe.AMOUNT).toString(),
@@ -146,6 +147,11 @@ public class AddRecipeController extends BaseController {
             addAllInstructions(recipe);
 
         } else {
+            for(IngredientRecipe i : currentRecipe.getIngredients()) {
+                currentRecipe.removeIngredient((Long)i.getFieldValue(IngredientRecipe.IID));
+            }
+            addAllIngredients(currentRecipe);
+
             currentRecipe.removeAllInstructions();
 
             if (instructionsView.getItems().size() > 0) {

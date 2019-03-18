@@ -92,6 +92,7 @@ public class Recipe extends Entity {
   public void removeAllInstructions() {
     instructions = new ArrayList<Instruction>();
   }
+
   public void addIngredient(Ingredient ingredient, Integer amount, String unit) {
     IngredientRecipe ingredient_recipe =
         new IngredientRecipe((Long) this.getFieldValue("rid"), ingredient, amount, unit);
