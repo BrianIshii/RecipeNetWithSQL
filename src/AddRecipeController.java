@@ -147,6 +147,9 @@ public class AddRecipeController extends BaseController {
             addAllInstructions(recipe);
 
         } else {
+
+            currentRecipe.setFieldValue(Recipe.TITLE,recipeNameLabel.getText());
+            currentRecipe.setFieldValue(Recipe.URL, imageURL);
             for(IngredientRecipe i : currentRecipe.getIngredients()) {
                 currentRecipe.removeIngredient((Long)i.getFieldValue(IngredientRecipe.IID));
             }
