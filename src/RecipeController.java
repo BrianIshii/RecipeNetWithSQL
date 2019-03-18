@@ -55,6 +55,7 @@ public class RecipeController extends BaseController {
                 image.setImage(i);
             } else {
                 image.setFitHeight(0.0);
+                
             }
         } catch(EntityNotFoundException enfe) {
             //TODO add failure behavior
