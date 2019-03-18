@@ -71,6 +71,7 @@
                <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#forwardButtonPressed" text="&gt;" AnchorPane.rightAnchor="0.0" />
                <Separator prefWidth="200.0" visible="false" />
                <Button fx:id="homeButton" mnemonicParsing="false" onAction="#homeButtonPressed" text="Home" />
+               <Button fx:id="editButton" mnemonicParsing="false" onAction="#editButtonPressed" text="Edit Recipe" />
            </items>
        </ToolBar>
    </children>

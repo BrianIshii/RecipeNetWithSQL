@@ -1,6 +1,8 @@
 import View.AutoCompletionTextField;
 import View.Unit;
 import entity.Ingredient;
+import entity.IngredientRecipe;
+import entity.Instruction;
 import entity.Recipe;
 import exception.DuplicateEntryException;
 import exception.ExecutorException;
@@ -25,6 +27,7 @@ import java.util.*;
 
 public class AddRecipeController extends BaseController {
 
+    public static Recipe currentRecipe;
     public static String FXML = "AddRecipe.fxml";
     private static IngredientService ingredientService = IngredientService.getInstance();
 
@@ -40,6 +43,7 @@ public class AddRecipeController extends BaseController {
     private String selectedIngredient;
     private String selectedInstruction;
     private Map<String, Ingredient> ingredients = new HashMap<>();
+    private Map<Long, String> ingredientNameByID = new HashMap<>();
     private List<String> listOfIngredients = new ArrayList<>();
     private String imageURL = "";
 
@@ -54,8 +58,9 @@ public class AddRecipeController extends BaseController {
 
         try {
             for (Ingredient i : ingredientService.searchAll()) {
-                String name = (String)i.getField(Ingredient.NAME).getValue();
+                String name = (String)i.getFieldValue(Ingredient.NAME);
                 ingredients.put(name, i);
+                ingredientNameByID.put((Long)(i.getFieldValue(Ingredient.IID)), name);
                 listOfIngredients.add(name);
             }
         } catch (ExecutorException e) {
@@ -64,6 +69,7 @@ public class AddRecipeController extends BaseController {
 
         backButton.setDisable(!canPressBackButton());
         forwardButton.setDisable(!canPressForwardButton());
+
         removeIngredientButton.setOpacity(0.3);
         removeInstructionButton.setOpacity(0.3);
         removeIngredientButton.setDisable(true);
@@ -82,6 +88,20 @@ public class AddRecipeController extends BaseController {
                 selectedInstruction = observable.getValue();
             }
         });
+
+        if (currentRecipe != null) {
+            recipeNameLabel.setText((String) currentRecipe.getFieldValue(Recipe.TITLE));
+
+            for(IngredientRecipe i : currentRecipe.getIngredients()) {
+                addIngredientToList(ingredientNameByID.get((Long)i.getFieldValue(IngredientRecipe.IID)),
+                        i.getFieldValue(IngredientRecipe.AMOUNT).toString(),
+                        (String)i.getFieldValue(IngredientRecipe.UNIT));
+            }
+
+            for(Instruction i : currentRecipe.getInstructions()) {
+                addInstructionToList((String)i.getFieldValue(Instruction.DESCRIPTION));
+            }
+        }
     }
 
     @FXML
@@ -134,30 +154,36 @@ public class AddRecipeController extends BaseController {
 
 
     public void saveButtonPressed(ActionEvent event) throws IOException {
-        String defaultImageURL = "resources/img/recipe_default.jpg";
+        //String defaultImageURL = "resources/img/recipe_default.jpg";
 
-        // New recipe
-        Recipe recipe = new Recipe(recipeNameLabel.getText(),
-                imageURL.isEmpty() ? defaultImageURL : imageURL,
-                Main.getUser(), new Date(20180101), 4);
+        if (currentRecipe == null) {
+            // New recipe
+            Recipe recipe = new Recipe(recipeNameLabel.getText(),
+                    imageURL,
+                    Main.getUser(), new Date(20180101), 4);
 
-        // Add data
-        addAllIngredients(recipe);
-        addAllInstructions(recipe);
+            // Add data
+            addAllIngredients(recipe);
+            addAllInstructions(recipe);
 
-        // Commit
-        try {
-            recipeService.save(recipe);
+            // Commit
+            try {
+                recipeService.save(recipe);
 
-            // Transit view
-            changeViewTo(HomeController.FXML);
-        } catch(DuplicateEntryException dee) {
-            dee.printStackTrace();
-            //TODO add failure behavior
-        } catch(ExecutorException ee) {
-            ee.printStackTrace();
-            //TODO add failure behavior
+                // Transit view
+                changeViewTo(HomeController.FXML);
+            } catch(DuplicateEntryException dee) {
+                dee.printStackTrace();
+                //TODO add failure behavior
+            } catch(ExecutorException ee) {
+                ee.printStackTrace();
+                //TODO add failure behavior
+                // New recipe
+            }
+        } else {
         }
+
+        currentRecipe = null;
     }
 
     @FXML
@@ -357,5 +383,11 @@ public class AddRecipeController extends BaseController {
                 }
             }
         }
+    }
+
+    @Override
+    public void backButtonPressed(ActionEvent event) throws IOException {
+        currentRecipe = null;
+        super.backButtonPressed(event);
     }
 }

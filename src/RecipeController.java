@@ -24,6 +24,7 @@ import java.io.IOException;
 public class RecipeController extends BaseController {
     public static String FXML = "Recipe.fxml";
     public static Long recipeID = Long.valueOf(0);
+    private Recipe recipe;
 
     private RecipeService recipeService = RecipeService.getInstance();
 
@@ -45,15 +46,17 @@ public class RecipeController extends BaseController {
         forwardButton.setDisable(!canPressForwardButton());
 
         System.out.println("Recipe id: " + recipeID);
-        Recipe r = null;
+        recipe = null;
         try{
-            r = recipeService.searchById(recipeID);
-            recipeNameLabel.setText((String)r.getFieldValue(Recipe.TITLE));
-            String url = (String)r.getFieldValue(Recipe.URL);
+            recipe = recipeService.searchById(recipeID);
+            recipeNameLabel.setText((String)recipe.getFieldValue(Recipe.TITLE));
+            String url = (String)recipe.getFieldValue(Recipe.URL);
             if (url != null &&
                     "" != url && !url.isEmpty()) {
-                Image i = new Image((String)r.getFieldValue(Recipe.URL));
+                Image i = new Image((String)recipe.getFieldValue(Recipe.URL));
                 image.setImage(i);
+            } else {
+                image.setFitHeight(0.0);
             }
         } catch(EntityNotFoundException enfe) {
             //TODO add failure behavior
@@ -61,13 +64,13 @@ public class RecipeController extends BaseController {
             //TODO add failure behavior
         }
 
-        for (IngredientRecipe ir : r.getIngredients()) {
+        for (IngredientRecipe ir : recipe.getIngredients()) {
             Ingredient i = ir.getIngredient();
             String ingredientInfo = (i.getFieldValue(Ingredient.NAME) + "/" + ir.getField("amount").getValue() + " " + ir.getField("unit").getValue());
             ingredientsView.getItems().add(ingredientInfo);
         }
 
-        for (Instruction i : r.getInstructions()) {
+        for (Instruction i : recipe.getInstructions()) {
             String instructionInfo = (i.getField("step").getValue() + ". " + i.getField("description").getValue());
             instructionsView.getItems().add(instructionInfo);
             System.out.println(instructionInfo);
@@ -91,10 +94,15 @@ public class RecipeController extends BaseController {
             }
         }));
 
-        System.out.println(r);
+        System.out.println(recipe);
     }
 
     public void homeButtonPressed(ActionEvent event) throws IOException {
         changeViewTo(HomeController.FXML);
+    }
+
+    public void editButtonPressed(ActionEvent event) throws IOException {
+        AddRecipeController.currentRecipe = recipe;
+        changeViewTo(AddRecipeController.FXML);
     }
 }
