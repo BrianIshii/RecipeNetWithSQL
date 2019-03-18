@@ -5,6 +5,7 @@ import entity.Recipe;
 import exception.EntityNotFoundException;
 import exception.ExecutorException;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import service.RecipeService;
@@ -42,6 +43,28 @@ public class RecipeController extends BaseController {
     @FXML
     public void initialize() {
 
+        instructionsView.setCellFactory(param -> new ListCell<String>(){
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item==null) {
+                    setGraphic(null);
+                    setText(null);
+                    // other stuff to do...
+                }else{
+                    // set the width's
+                    setMinWidth(param.getWidth()-5);
+                    setMaxWidth(param.getWidth()-5);
+                    setPrefWidth(param.getWidth()-5);
+
+                    // allow wrapping
+                    setWrapText(true);
+
+                    setText(item.toString());
+                }
+            }
+        });
+
         backButton.setDisable(!canPressBackButton());
         forwardButton.setDisable(!canPressForwardButton());
 
@@ -55,7 +78,7 @@ public class RecipeController extends BaseController {
                 image.setImage(i);
             } else {
                 image.setFitHeight(0.0);
-                
+
             }
         } catch(EntityNotFoundException enfe) {
             //TODO add failure behavior
