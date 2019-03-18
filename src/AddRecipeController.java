@@ -10,6 +10,8 @@ import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
@@ -29,6 +31,8 @@ public class AddRecipeController extends BaseController {
     @FXML ListView<String> ingredientsView = new ListView<>();
     @FXML ListView<String> instructionsView = new ListView<>();
     @FXML Label recipeNameLabel;
+    @FXML Button editRecipeImageButton;
+    @FXML ImageView recipeImageView;
     @FXML private Button backButton;
     @FXML private Button forwardButton;
     @FXML Button removeIngredientButton;
@@ -37,6 +41,7 @@ public class AddRecipeController extends BaseController {
     private String selectedInstruction;
     private Map<String, Ingredient> ingredients = new HashMap<>();
     private List<String> listOfIngredients = new ArrayList<>();
+    private String imageURL = "";
 
     public AddRecipeController() {
         super(FXML);
@@ -44,6 +49,8 @@ public class AddRecipeController extends BaseController {
 
     @FXML
     public void initialize() {
+
+        editRecipeImageButton.setVisible(false);
 
         try {
             for (Ingredient i : ingredientService.searchAll()) {
@@ -127,8 +134,12 @@ public class AddRecipeController extends BaseController {
 
 
     public void saveButtonPressed(ActionEvent event) throws IOException {
+        String defaultImageURL = "resources/img/recipe_default.jpg";
+
         // New recipe
-        Recipe recipe = new Recipe(recipeNameLabel.getText(), "", Main.getUser(), new Date(20180101), 4);
+        Recipe recipe = new Recipe(recipeNameLabel.getText(),
+                imageURL.isEmpty() ? defaultImageURL : imageURL,
+                Main.getUser(), new Date(20180101), 4);
 
         // Add data
         addAllIngredients(recipe);
@@ -298,6 +309,53 @@ public class AddRecipeController extends BaseController {
             this.name = name;
             this.amount = amount;
             this.unit = unit;
+        }
+    }
+
+    @FXML
+    public void mouseEnteredRecipeImage() {
+        editRecipeImageButton.setVisible(true);
+    }
+
+    @FXML
+    public void mouseExitedRecipeImage() {
+        editRecipeImageButton.setVisible(false);
+    }
+
+    @FXML
+    public void mouseEnteredEditRecipeImage() {
+        editRecipeImageButton.setVisible(true);
+    }
+
+    @FXML
+    public void mouseExitedEditRecipeImage() {
+        editRecipeImageButton.setVisible(false);
+    }
+
+    @FXML
+    public void editRecipeImageButtonPressed() {
+        TextInputDialog dialog = new TextInputDialog(imageURL);
+        dialog.setTitle("Change Recipe Image");
+        dialog.setHeaderText(null);
+        dialog.setGraphic(null);
+        dialog.setContentText("Recipe Image URL:");
+
+        // Traditional way to get the response value.
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            if (isValidInput(result.get())) {
+                try {
+                    recipeImageView.setImage(new Image(result.get()));
+                    imageURL = result.get();
+                } catch (Exception e) {
+                    // Alert
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Image URL Invalid");
+                    alert.showAndWait();
+                }
+            }
         }
     }
 }

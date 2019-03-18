@@ -26,7 +26,7 @@
                <VBox.margin>
                   <Insets bottom="15.0" top="15.0" />
                </VBox.margin></Label>
-                  <ImageView fx:id="image" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+                  <ImageView fx:id="image" fitHeight="200.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true" />
                   <BorderPane>
                      <VBox.margin>
                         <Insets bottom="5.0" left="30.0" right="30.0" />
