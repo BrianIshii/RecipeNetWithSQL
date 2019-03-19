@@ -125,6 +125,7 @@ public class RecipeController extends BaseController {
     }
 
     public void homeButtonPressed(ActionEvent event) throws IOException {
+        Main.setUser(Main.getLoggedInUser());
         changeViewTo(HomeController.FXML);
     }
 

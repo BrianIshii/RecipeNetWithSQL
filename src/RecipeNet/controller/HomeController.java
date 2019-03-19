@@ -14,6 +14,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.text.Text;
+import sun.print.DialogOnTop;
+import sun.rmi.runtime.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,6 +36,9 @@ public class HomeController extends BaseController {
   @FXML private Button addRecipe;
   @FXML ListView<String> listView = new ListView<>();
   @FXML private AutoCompletionTextField searchField = new AutoCompletionTextField();
+  @FXML private Button Logout;
+  @FXML private Button homeButton;
+
 
   public HomeController() {
     super(FXML);
@@ -46,8 +51,20 @@ public class HomeController extends BaseController {
     forwardButton.setDisable(!canPressForwardButton());
 
     user = Main.getUser();
+
+    Logout.managedProperty().bind(Logout.visibleProperty());
+    homeButton.managedProperty().bind(homeButton.visibleProperty());
+
     isOwner = Main.userHasPermission(user);
-    addRecipe.setVisible(isOwner);
+    if(isOwner) {
+      addRecipe.setVisible(true);
+      homeButton.setVisible(false);
+      Logout.setVisible(true);
+    } else {
+      addRecipe.setVisible(false);
+      homeButton.setVisible(true);
+      Logout.setVisible(false);
+    }
 
     if (isOwner) name.setText("Welcome, " + (user.getFieldValue(User.NAME)));
     else name.setText(user.getFieldValue(User.NAME) + "'s recipes");
@@ -107,6 +124,11 @@ public class HomeController extends BaseController {
 
   public void logoutButtonPressed(ActionEvent event) throws IOException {
     logout();
+  }
+
+  public void homeButtonPressed(ActionEvent event) throws IOException {
+    Main.setUser(Main.getLoggedInUser());
+    changeViewTo(HomeController.FXML);
   }
 
   public void addRecipeButtonPressed(ActionEvent event) throws IOException {

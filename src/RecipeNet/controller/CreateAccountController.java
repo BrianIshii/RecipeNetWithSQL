@@ -49,7 +49,7 @@ public class CreateAccountController {
                 alert.showAndWait();
 
                 // Transition to home view
-                Main.setUser(newUser);
+                Main.setLoggedInUser(newUser);
                 Parent root = FXMLLoader.load(getClass().getResource("Home.fxml"));
                 Main.getPrimaryStage().getScene().setRoot(root);
             } catch (DuplicateEntryException dee) {

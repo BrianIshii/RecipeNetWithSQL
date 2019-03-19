@@ -56,6 +56,7 @@ public class BaseController {
 
     protected void logout() {
         Main.setUser(null);
+        Main.setLoggedInUser(null);
         views = new ArrayList<>();
         currentViewIndex = 0;
         changeView(MainController.FXML);
