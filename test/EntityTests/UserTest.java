@@ -1,8 +1,8 @@
 package EntityTests;
 
-import schema.Field;
-import entity.Status;
-import entity.User;
+import RecipeNet.schema.Field;
+import RecipeNet.entity.Status;
+import RecipeNet.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

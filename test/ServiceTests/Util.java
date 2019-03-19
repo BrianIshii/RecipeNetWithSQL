@@ -1,10 +1,10 @@
 package ServiceTests;
 
-import entity.*;
-import exception.ExecutorException;
-import service.DatabaseConnection;
-import service.UserService;
-import utilities.DateUtils;
+import RecipeNet.entity.*;
+import RecipeNet.exception.ExecutorException;
+import RecipeNet.service.DatabaseConnection;
+import RecipeNet.service.UserService;
+import RecipeNet.util.DateUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

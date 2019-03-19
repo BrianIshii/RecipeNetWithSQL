@@ -1,15 +1,15 @@
 package ServiceTests;
 
-import entity.Ingredient;
-import entity.Recipe;
-import entity.Status;
-import entity.User;
-import exception.ExecutorException;
+import RecipeNet.entity.Ingredient;
+import RecipeNet.entity.Recipe;
+import RecipeNet.entity.Status;
+import RecipeNet.entity.User;
+import RecipeNet.exception.ExecutorException;
 import org.junit.jupiter.api.*;
-import service.IngredientService;
-import service.RecipeService;
-import service.UserService;
-import utilities.DateUtils;
+import RecipeNet.service.IngredientService;
+import RecipeNet.service.RecipeService;
+import RecipeNet.service.UserService;
+import RecipeNet.util.DateUtils;
 
 import java.sql.SQLException;
 import java.util.Date;
