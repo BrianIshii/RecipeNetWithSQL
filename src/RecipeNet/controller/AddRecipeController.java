@@ -377,11 +377,20 @@ public class AddRecipeController extends BaseController {
 
     private void addInstructionToList(String s) {
         if (isValidInput(s)) {
-            // Add to listView
-            instructionsView.getItems().add(s);
+            if (s.length() < 500) {
+                // Add to listView
+                instructionsView.getItems().add(s);
 
-            removeInstructionButton.setOpacity(1.0);
-            removeInstructionButton.setDisable(false);
+                removeInstructionButton.setOpacity(1.0);
+                removeInstructionButton.setDisable(false);
+            } else {
+                // Alert
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("");
+                alert.setHeaderText(null);
+                alert.setContentText("Instruction is too long. More than 500 characters.");
+                alert.showAndWait();
+            }
         }
     }
 

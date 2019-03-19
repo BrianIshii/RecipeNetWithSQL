@@ -14,8 +14,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.text.Text;
-import sun.print.DialogOnTop;
-import sun.rmi.runtime.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
