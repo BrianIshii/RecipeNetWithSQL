@@ -391,13 +391,18 @@ public class AddRecipeController extends BaseController {
             }
             return null;
         });
-        Optional<String> optionalResult = dialog.showAndWait();
-        optionalResult.ifPresent((String result) -> {
-            addInstructionToList(result);
+
+        final Button btOk = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
+        btOk.addEventFilter(ActionEvent.ACTION, event -> {
+            if (!addInstructionToList(textArea.getText())) {
+                event.consume();
+            }
         });
+
+        dialog.showAndWait();
     }
 
-    private void addInstructionToList(String s) {
+    private boolean addInstructionToList(String s) {
         if (isValidInput(s)) {
             if (s.length() < 500) {
                 // Add to listView
@@ -405,6 +410,8 @@ public class AddRecipeController extends BaseController {
 
                 removeInstructionButton.setOpacity(1.0);
                 removeInstructionButton.setDisable(false);
+
+                return true;
             } else {
                 // Alert
                 Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -412,8 +419,12 @@ public class AddRecipeController extends BaseController {
                 alert.setHeaderText(null);
                 alert.setContentText("Instruction is too long. More than 500 characters.");
                 alert.showAndWait();
+
+                return false;
             }
         }
+
+        return false;
     }
 
     private void addAllIngredients(Recipe recipe) {
