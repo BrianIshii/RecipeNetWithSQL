@@ -64,7 +64,12 @@ public class HomeController extends BaseController {
             //TODO determine behavior
         }
 
-        // initialize search autocompletion
+        init_autocomplete();
+
+    }
+
+    private void init_autocomplete() {
+
         List<String> listOfRecipes = new ArrayList<>();
         List<String> listOfUsers = new ArrayList<>();
         try {
@@ -82,7 +87,6 @@ public class HomeController extends BaseController {
 
         searchField.getEntries().addAll(listOfRecipes);
         searchField.getEntries().addAll(listOfUsers);
-
     }
 
     public void logoutButtonPressed(ActionEvent event) throws IOException {
@@ -95,7 +99,8 @@ public class HomeController extends BaseController {
 
     public void onSearch(ActionEvent event) {
 
-        System.out.println(searchField.getCharacters());
+        SearchResultsController.setSearchTerm(searchField.getCharacters().toString());
+        changeViewTo(SearchResultsController.FXML);
     }
 
 

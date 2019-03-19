@@ -18,6 +18,7 @@ public class BaseController {
     public BaseController(String FXML) {
 //        System.out.println("current index " + currentViewIndex);
 //        System.out.println(views.size());
+
         this.FXML = FXML;
     }
 
