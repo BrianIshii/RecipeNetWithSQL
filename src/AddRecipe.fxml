@@ -51,7 +51,7 @@
                      <children>
                         <Button mnemonicParsing="false" onMouseEntered="#mouseEnteredRecipeImage" onMouseExited="#mouseExitedRecipeImage" style="-fx-background-color: transparent;">
                            <graphic>
-                              <ImageView fx:id="recipeImageView" fitHeight="200.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="recipeImageView" fitHeight="200.0" fitWidth="580.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
                                     <Image url="@/resources/img/recipe_default.jpg" />
                                  </image>

@@ -1,6 +1,8 @@
 import View.AutoCompletionTextField;
 import View.Unit;
 import entity.Ingredient;
+import entity.IngredientRecipe;
+import entity.Instruction;
 import entity.Recipe;
 import exception.DuplicateEntryException;
 import exception.ExecutorException;
@@ -14,6 +16,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import service.IngredientService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -24,6 +27,7 @@ import java.util.*;
 
 public class AddRecipeController extends BaseController {
 
+    public static Recipe currentRecipe;
     public static String FXML = "AddRecipe.fxml";
     private static IngredientService ingredientService = IngredientService.getInstance();
 
@@ -39,6 +43,7 @@ public class AddRecipeController extends BaseController {
     private String selectedIngredient;
     private String selectedInstruction;
     private Map<String, Ingredient> ingredients = new HashMap<>();
+    private Map<Long, String> ingredientNameByID = new HashMap<>();
     private List<String> listOfIngredients = new ArrayList<>();
     private String imageURL = "";
 
@@ -51,10 +56,33 @@ public class AddRecipeController extends BaseController {
 
         editRecipeImageButton.setVisible(false);
 
+        instructionsView.setCellFactory(param -> new ListCell<String>(){
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item==null) {
+                    setGraphic(null);
+                    setText(null);
+                    // other stuff to do...
+                }else{
+                    // set the width's
+                    setMinWidth(param.getWidth()-5);
+                    setMaxWidth(param.getWidth()-5);
+                    setPrefWidth(param.getWidth()-5);
+
+                    // allow wrapping
+                    setWrapText(true);
+
+                    setText(item.toString());
+                }
+            }
+        });
+
         try {
             for (Ingredient i : ingredientService.searchAll()) {
-                String name = (String)i.getField(Ingredient.NAME).getValue();
+                String name = (String)i.getFieldValue(Ingredient.NAME);
                 ingredients.put(name, i);
+                ingredientNameByID.put((Long)(i.getFieldValue(Ingredient.IID)), name);
                 listOfIngredients.add(name);
             }
         } catch (ExecutorException e) {
@@ -63,6 +91,7 @@ public class AddRecipeController extends BaseController {
 
         backButton.setDisable(!canPressBackButton());
         forwardButton.setDisable(!canPressForwardButton());
+
         removeIngredientButton.setOpacity(0.3);
         removeInstructionButton.setOpacity(0.3);
         removeIngredientButton.setDisable(true);
@@ -81,6 +110,24 @@ public class AddRecipeController extends BaseController {
                 selectedInstruction = observable.getValue();
             }
         });
+
+        if (currentRecipe != null) {
+            recipeNameLabel.setText((String) currentRecipe.getFieldValue(Recipe.TITLE));
+            String url = (String) currentRecipe.getFieldValue(Recipe.URL);
+            if (!url.isEmpty()) {
+                recipeImageView.setImage(new Image(url));
+            }
+
+            for(IngredientRecipe i : currentRecipe.getIngredients()) {
+                addIngredientToList(ingredientNameByID.get((Long)i.getFieldValue(IngredientRecipe.IID)),
+                        i.getFieldValue(IngredientRecipe.AMOUNT).toString(),
+                        (String)i.getFieldValue(IngredientRecipe.UNIT));
+            }
+
+            for(Instruction i : currentRecipe.getInstructions()) {
+                addInstructionToList((String)i.getFieldValue(Instruction.DESCRIPTION));
+            }
+        }
     }
 
     @FXML
@@ -109,29 +156,70 @@ public class AddRecipeController extends BaseController {
 
 
     public void saveButtonPressed(ActionEvent event) throws IOException {
-        String defaultImageURL = "resources/img/recipe_default.jpg";
+        //String defaultImageURL = "resources/img/recipe_default.jpg";
 
-        // New recipe
-        Recipe recipe = new Recipe(recipeNameLabel.getText(),
-                imageURL.isEmpty() ? defaultImageURL : imageURL,
-                Main.getUser(), new Date(20180101), 4);
+        Recipe recipe;
+        if (currentRecipe == null) {
+            // New recipe
+            recipe = new Recipe(recipeNameLabel.getText(),
+                    imageURL,
+                    Main.getUser(), new Date(20180101), 4);
 
-        // Add data
-        addAllIngredients(recipe);
-        addAllInstructions(recipe);
+            // Add data
+            addAllIngredients(recipe);
+            addAllInstructions(recipe);
 
-        // Commit
-        try {
-            recipeService.save(recipe);
+            // Commit
+            try {
+                recipeService.save(recipe);
 
-            // Transit view
-            changeViewTo(HomeController.FXML);
-        } catch(DuplicateEntryException dee) {
-            dee.printStackTrace();
-            //TODO add failure behavior
-        } catch(ExecutorException ee) {
-            ee.printStackTrace();
-            //TODO add failure behavior
+                // Transit view
+                changeViewTo(HomeController.FXML);
+            } catch(DuplicateEntryException dee) {
+                dee.printStackTrace();
+                //TODO add failure behavior
+            } catch(ExecutorException ee) {
+                ee.printStackTrace();
+                //TODO add failure behavior
+                // New recipe
+            }
+            currentRecipe = null;
+        } else {
+
+            currentRecipe.setFieldValue(Recipe.TITLE,recipeNameLabel.getText());
+            
+            if (!imageURL.isEmpty()) {
+                currentRecipe.setFieldValue(Recipe.URL, imageURL);
+            }
+            for(IngredientRecipe i : currentRecipe.getIngredients()) {
+                currentRecipe.removeIngredient((Long)i.getFieldValue(IngredientRecipe.IID));
+            }
+            addAllIngredients(currentRecipe);
+
+            currentRecipe.removeAllInstructions();
+
+            if (instructionsView.getItems().size() > 0) {
+                addAllInstructions(currentRecipe);
+            }
+
+            recipe = currentRecipe;
+
+            // Commit
+            try {
+                recipeService.save(recipe);
+
+                // Transit view
+                RecipeController.recipeID = (Long) currentRecipe.getFieldValue(Recipe.RID);
+                changeViewTo(RecipeController.FXML);
+            } catch(DuplicateEntryException dee) {
+                dee.printStackTrace();
+                //TODO add failure behavior
+            } catch(ExecutorException ee) {
+                ee.printStackTrace();
+                //TODO add failure behavior
+                // New recipe
+            }
+            currentRecipe = null;
         }
     }
 
@@ -206,6 +294,30 @@ public class AddRecipeController extends BaseController {
         });
     }
 
+    @FXML
+    public void removeInstructionButtonPressed(ActionEvent event) throws IOException {
+        if (selectedInstruction == null) {
+            // Alert
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("");
+            alert.setHeaderText(null);
+            alert.setContentText("Select an instruction to remove");
+            alert.showAndWait();
+
+            return;
+        }
+
+        instructionsView.getItems().remove(selectedInstruction);
+
+        instructionsView.getSelectionModel().clearSelection();
+        selectedInstruction = null;
+
+        if (instructionsView.getItems().size() == 0) {
+            removeInstructionButton.setOpacity(0.3);
+            removeInstructionButton.setDisable(true);
+        }
+    }
+
     private void addIngredientToList(String name, String amount, String unit) {
         if (isValidInput(name) &&
             isValidInput(amount) &&
@@ -220,17 +332,44 @@ public class AddRecipeController extends BaseController {
 
     @FXML
     public void addInstructionButtonPressed() {
-        TextInputDialog dialog = new TextInputDialog();
+        Dialog<String> dialog = new Dialog<>();
         dialog.setTitle("New Instruction Step");
         dialog.setHeaderText(null);
         dialog.setGraphic(null);
-        dialog.setContentText("Instruction Step:");
 
-        // Traditional way to get the response value.
-        Optional<String> result = dialog.showAndWait();
-        if (result.isPresent()){
-            addInstructionToList(result.get());
-        }
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        Label label = new Label("Instruction Step:");
+        label.setPrefWidth(150);
+        label.setAlignment(Pos.CENTER_RIGHT);
+        label.setPadding(new Insets(0, 5, 0, 0));
+        TextArea textArea = new TextArea();
+        HBox hbox = new HBox(label, textArea);
+        hbox.setAlignment(Pos.CENTER);
+
+        textArea.setWrapText(true);
+        textArea.setPrefHeight(100);
+
+        textArea.textProperty().addListener((observable, oldValue, newValue) -> {
+            Text text = (Text) textArea.lookup(".text");
+            double newHeight = text.boundsInParentProperty().get().getMaxY();
+
+            textArea.setPrefHeight(newHeight > 100 ? newHeight : 100);
+        });
+
+        dialogPane.setContent(new VBox(8, hbox));
+        Platform.runLater(textArea::requestFocus);
+        dialog.setResultConverter((ButtonType button) -> {
+            if (button == ButtonType.OK) {
+                return textArea.getText();
+            }
+            return null;
+        });
+        Optional<String> optionalResult = dialog.showAndWait();
+        optionalResult.ifPresent((String result) -> {
+            addInstructionToList(result);
+        });
     }
 
     private void addInstructionToList(String s) {
@@ -332,5 +471,11 @@ public class AddRecipeController extends BaseController {
                 }
             }
         }
+    }
+
+    @Override
+    public void backButtonPressed(ActionEvent event) throws IOException {
+        currentRecipe = null;
+        super.backButtonPressed(event);
     }
 }

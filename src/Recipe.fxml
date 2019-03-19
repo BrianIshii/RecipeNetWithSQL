@@ -26,10 +26,11 @@
                <VBox.margin>
                   <Insets bottom="15.0" top="15.0" />
                </VBox.margin></Label>
-                  <ImageView fx:id="image" fitHeight="200.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fx:id="image" fitHeight="200.0" fitWidth="580.0" pickOnBounds="true" preserveRatio="true">
                      <VBox.margin>
                         <Insets bottom="15.0" />
-                     </VBox.margin></ImageView>
+                     </VBox.margin>
+                  </ImageView>
                   <BorderPane>
                      <VBox.margin>
                         <Insets bottom="5.0" left="30.0" right="30.0" />
@@ -74,6 +75,7 @@
                <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#forwardButtonPressed" text="&gt;" AnchorPane.rightAnchor="0.0" />
                <Separator prefWidth="200.0" visible="false" />
                <Button fx:id="homeButton" mnemonicParsing="false" onAction="#homeButtonPressed" text="Home" />
+               <Button fx:id="editButton" mnemonicParsing="false" onAction="#editButtonPressed" text="Edit Recipe" />
            </items>
        </ToolBar>
    </children>
