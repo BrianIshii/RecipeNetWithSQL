@@ -1,7 +1,4 @@
-import entity.Ingredient;
-import entity.IngredientRecipe;
-import entity.Instruction;
-import entity.Recipe;
+import entity.*;
 import exception.EntityNotFoundException;
 import exception.ExecutorException;
 import javafx.scene.control.Label;
@@ -26,6 +23,7 @@ public class RecipeController extends BaseController {
     public static String FXML = "Recipe.fxml";
     public static Long recipeID = Long.valueOf(0);
     private Recipe recipe;
+    private Boolean isOwner;
 
     private RecipeService recipeService = RecipeService.getInstance();
 
@@ -35,6 +33,7 @@ public class RecipeController extends BaseController {
     @FXML ListView<String> ingredientsView = new ListView<>();
     @FXML ListView<String> instructionsView = new ListView<>();
     @FXML Label recipeNameLabel;
+    @FXML Button editButton;
 
     public RecipeController() {
         super(FXML);
@@ -71,6 +70,8 @@ public class RecipeController extends BaseController {
         recipe = null;
         try{
             recipe = recipeService.searchById(recipeID);
+            isOwner = Main.userHasPermission((Long)recipe.getFieldValue(Recipe.UID));
+            editButton.setVisible(isOwner);
             recipeNameLabel.setText((String)recipe.getFieldValue(Recipe.TITLE));
             String url = (String)recipe.getFieldValue(Recipe.URL);
             if (!url.isEmpty()) {
@@ -78,7 +79,6 @@ public class RecipeController extends BaseController {
                 image.setImage(i);
             } else {
                 image.setFitHeight(0.0);
-
             }
         } catch(EntityNotFoundException enfe) {
             //TODO add failure behavior
@@ -93,7 +93,7 @@ public class RecipeController extends BaseController {
         }
 
         for (Instruction i : recipe.getInstructions()) {
-            String instructionInfo = (i.getField("step").getValue() + ". " + i.getField("description").getValue());
+            String instructionInfo = (i.getFieldValue(Instruction.STEP) + ". " + i.getFieldValue(Instruction.DESCRIPTION));
             instructionsView.getItems().add(instructionInfo);
         }
 

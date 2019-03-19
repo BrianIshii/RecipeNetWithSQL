@@ -17,91 +17,101 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HomeController extends BaseController {
-    public static String FXML = "Home.fxml";
+  public static String FXML = "Home.fxml";
 
-    private RecipeService recipeService = RecipeService.getInstance();
-    private UserService userService = UserService.getInstance();
-    private ArrayList<Long> recipeIDArray = new ArrayList();
-    private User user = Main.getUser();
+  private RecipeService recipeService = RecipeService.getInstance();
+  private UserService userService = UserService.getInstance();
+  private ArrayList<Long> recipeIDArray = new ArrayList();
+  private User user = Main.getUser();
+  private boolean isOwner = false;
 
-    @FXML private Text name;
-    @FXML private Button backButton;
-    @FXML private Button forwardButton;
-    @FXML ListView<String> listView = new ListView<>();
-    @FXML private AutoCompletionTextField searchField = new AutoCompletionTextField();
+  @FXML private Text name;
+  @FXML private Button backButton;
+  @FXML private Button forwardButton;
+  @FXML private Button addRecipe;
+  @FXML ListView<String> listView = new ListView<>();
+  @FXML private AutoCompletionTextField searchField = new AutoCompletionTextField();
 
-    public HomeController() {
-        super(FXML);
-    }
+  public HomeController() {
+    super(FXML);
+  }
 
-    @FXML
-    public void initialize() {
+  @FXML
+  public void initialize() {
 
-        backButton.setDisable(!canPressBackButton());
-        forwardButton.setDisable(!canPressForwardButton());
+    backButton.setDisable(!canPressBackButton());
+    forwardButton.setDisable(!canPressForwardButton());
 
-        user = Main.getUser();
-        name.setText("Welcome, " + (user.getFieldValue("name")));
+    user = Main.getUser();
+    isOwner = Main.userHasPermission(user);
+    addRecipe.setVisible(isOwner);
 
-        try {
-            List<Recipe> recipes = recipeService.searchByUser(user);
+    if (isOwner) name.setText("Welcome, " + (user.getFieldValue(User.NAME)));
+    else name.setText(user.getFieldValue(User.NAME) + "'s recipes");
 
-            for(Recipe r : recipes) {
-                recipeIDArray.add((Long)r.getFieldValue(Recipe.RID));
-                listView.getItems().add((String)r.getField("title").getValue());
-            }
+    try {
+      List<Recipe> recipes = recipeService.searchByUser(user);
 
-            listView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+      for (Recipe r : recipes) {
+        recipeIDArray.add((Long) r.getFieldValue(Recipe.RID));
+        listView.getItems().add((String) r.getField("title").getValue());
+      }
+
+      listView
+          .getSelectionModel()
+          .selectedItemProperty()
+          .addListener(
+              new ChangeListener<String>() {
                 @Override
-                public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                    //System.out.println(recipeNameToRecipeID.get(observable.getFieldValue()));
-                    RecipeController.recipeID = recipeIDArray.get(listView.getSelectionModel().getSelectedIndex());
-                    changeViewTo(RecipeController.FXML);
+                public void changed(
+                    ObservableValue<? extends String> observable,
+                    String oldValue,
+                    String newValue) {
+                  // System.out.println(recipeNameToRecipeID.get(observable.getFieldValue()));
+                  RecipeController.recipeID =
+                      recipeIDArray.get(listView.getSelectionModel().getSelectedIndex());
+                  changeViewTo(RecipeController.FXML);
                 }
-            });
-        } catch (ExecutorException ee) {
-            ee.printStackTrace();
-            //TODO determine behavior
-        }
-
-        init_autocomplete();
-
+              });
+    } catch (ExecutorException ee) {
+      ee.printStackTrace();
+      // TODO determine behavior
     }
 
-    private void init_autocomplete() {
+    init_autocomplete();
+  }
 
-        List<String> listOfRecipes = new ArrayList<>();
-        List<String> listOfUsers = new ArrayList<>();
-        try {
-            for (Recipe r : recipeService.searchAll()) {
-                String title = (String)r.getField(Recipe.TITLE).getValue();
-                listOfRecipes.add(title);
-            }
-            for (User u : userService.searchAll()) {
-                String name = (String)u.getField(User.NAME).getValue();
-                listOfUsers.add(name);
-            }
-        } catch (ExecutorException e) {
-            e.printStackTrace();
-        }
+  private void init_autocomplete() {
 
-        searchField.getEntries().addAll(listOfRecipes);
-        searchField.getEntries().addAll(listOfUsers);
+    List<String> listOfRecipes = new ArrayList<>();
+    List<String> listOfUsers = new ArrayList<>();
+    try {
+      for (Recipe r : recipeService.searchAll()) {
+        String title = (String) r.getField(Recipe.TITLE).getValue();
+        listOfRecipes.add(title);
+      }
+      for (User u : userService.searchAll()) {
+        String name = (String) u.getField(User.NAME).getValue();
+        listOfUsers.add(name);
+      }
+    } catch (ExecutorException e) {
+      e.printStackTrace();
     }
 
-    public void logoutButtonPressed(ActionEvent event) throws IOException {
-        logout();
-    }
+    searchField.getEntries().addAll(listOfRecipes);
+    searchField.getEntries().addAll(listOfUsers);
+  }
 
-    public void addRecipeButtonPressed(ActionEvent event) throws IOException {
-        changeViewTo(AddRecipeController.FXML);
-    }
+  public void logoutButtonPressed(ActionEvent event) throws IOException {
+    logout();
+  }
 
-    public void onSearch(ActionEvent event) {
+  public void addRecipeButtonPressed(ActionEvent event) throws IOException {
+    changeViewTo(AddRecipeController.FXML);
+  }
 
-        SearchResultsController.setSearchTerm(searchField.getCharacters().toString());
-        changeViewTo(SearchResultsController.FXML);
-    }
-
-
+  public void onSearch(ActionEvent event) {
+    SearchResultsController.setSearchTerm(searchField.getCharacters().toString());
+    changeViewTo(SearchResultsController.FXML);
+  }
 }
