@@ -396,7 +396,7 @@ public class AddRecipeController extends BaseController {
 
     private void addAllInstructions(Recipe recipe) {
         for (String s: instructionsView.getItems()) {
-            recipe.addInstruction(s.split(" ", 2)[1]);
+            recipe.addInstruction(s);
         }
     }
 
