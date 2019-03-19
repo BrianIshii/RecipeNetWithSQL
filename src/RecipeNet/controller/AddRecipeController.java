@@ -1,6 +1,7 @@
 package RecipeNet.controller;
 
 import RecipeNet.Main;
+import RecipeNet.util.StringUtils;
 import RecipeNet.view.AutoCompletionTextField;
 import RecipeNet.view.Unit;
 import RecipeNet.entity.Ingredient;
@@ -291,10 +292,15 @@ public class AddRecipeController extends BaseController {
             }
             return null;
         });
-        Optional<AddIngredientResult> optionalResult = dialog.showAndWait();
-        optionalResult.ifPresent((AddIngredientResult result) -> {
-            addIngredientToList(result.name, result.amount, result.unit);
+
+        final Button btOk = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
+        btOk.addEventFilter(ActionEvent.ACTION, event -> {
+            if (!addIngredientToList(nameTextField.getText(), amountTextField.getText(), unitTextField.getText())) {
+                event.consume();
+            }
         });
+
+        dialog.showAndWait();
     }
 
     @FXML
@@ -321,16 +327,32 @@ public class AddRecipeController extends BaseController {
         }
     }
 
-    private void addIngredientToList(String name, String amount, String unit) {
+    private boolean addIngredientToList(String name, String amount, String unit) {
         if (isValidInput(name) &&
             isValidInput(amount) &&
             isValidInput(unit)) {
-            String s = String.format("%s, %s, %s", name, amount, unit);
-            ingredientsView.getItems().add(s);
 
-            removeIngredientButton.setOpacity(1.0);
-            removeIngredientButton.setDisable(false);
+            if (StringUtils.isInteger(amount)) {
+                String s = String.format("%s, %s, %s", name, amount, unit);
+                ingredientsView.getItems().add(s);
+
+                removeIngredientButton.setOpacity(1.0);
+                removeIngredientButton.setDisable(false);
+
+                return true;
+            } else {
+                // Alert
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("");
+                alert.setHeaderText(null);
+                alert.setContentText("Amount needs to be an integer");
+                alert.showAndWait();
+
+                return false;
+            }
         }
+
+        return false;
     }
 
     @FXML
